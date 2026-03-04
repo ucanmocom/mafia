@@ -1,6 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react'
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3001'
+const WS_URL = import.meta.env.VITE_WS_URL || (() => {
+  // Construct WebSocket URL from current location
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const host = window.location.host
+  return `${protocol}//${host}`
+})()
 
 /**
  * useWebSocket – auto-reconnecting WebSocket hook.
