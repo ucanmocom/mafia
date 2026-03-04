@@ -1,6 +1,6 @@
 'use strict';
 
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const { ROLES, ROLE_DESCRIPTIONS, PHASES, TIMERS } = require('./types');
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ class GameManager {
     let code;
     do { code = generateRoomCode(); } while (this.rooms.has(code));
 
-    const playerId = uuidv4();
+    const playerId = randomUUID();
     const player = {
       id: playerId,
       nick: hostNick,
@@ -97,7 +97,7 @@ class GameManager {
 
     if (Object.keys(room.players).length >= 20) return { error: 'Pokój jest pełny.' };
 
-    const playerId = uuidv4();
+    const playerId = randomUUID();
     const player = {
       id: playerId,
       nick,
