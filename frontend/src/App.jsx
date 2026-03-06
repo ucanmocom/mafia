@@ -36,6 +36,8 @@ const INITIAL_STATE = {
   roleDescription: null,
   mafiaAllies: [],        // [{id, nick}] for mafia players
   loverNick:   null,      // nick of the partner (if lovers are enabled)
+  loverId:     null,      // id of the partner (if lovers are enabled)
+  cannotVoteLoverError: null,  // {targetNick} when trying to vote for lover
   // Night
   nightActionDone: false,
   mafiaVoteTally: {},     // {voterNick: targetNick}
@@ -149,6 +151,7 @@ export default function App() {
           roleDescription: data.description,
           mafiaAllies:     data.allies || [],
           loverNick:       data.loverNick || null,
+          loverId:         data.loverId || null,
         }))
         break
       }
@@ -177,6 +180,7 @@ export default function App() {
           votes:           {},
           votedCount:      0,
           mafiaVoteTally:  {},
+          cannotVoteLoverError: null,
           // Preserve detectiveResult so it continues showing during voting phase
           nightResult:     null,
           voteResult:      null,
@@ -370,7 +374,17 @@ export default function App() {
       }))
     },
     nightAction:(targetId) => send('night_action', { targetId }),
-    vote:        (targetId) => { send('vote', { targetId }); setState(s => ({ ...s, hasVoted: true })) },
+    vote:        (targetId) => {
+      const currentState = stateRef.current
+      // Cannot vote for self or lover
+      if (targetId === currentState.playerId || targetId === currentState.loverId) {
+        const targetPlayer = currentState.players.find(p => p.id === targetId)
+        setState(s => ({ ...s, cannotVoteLoverError: targetPlayer?.nick || 'Unknown' }))
+        return
+      }
+      send('vote', { targetId })
+      setState(s => ({ ...s, hasVoted: true }))
+    },
     leaveRoom:  () => {
       localStorage.removeItem(STORAGE_KEY)
       setState(INITIAL_STATE)

@@ -49,11 +49,13 @@ function sendRoles(room) {
   for (const player of Object.values(room.players)) {
     const allies = player.role === ROLES.MAFIA ? mafiaIds.filter((m) => m.id !== player.id) : [];
     const loverNick = player.loverId ? (room.players[player.loverId]?.nick ?? null) : null;
+    const loverId = player.loverId || null;
     send(player.ws, EVENTS.ROLE_ASSIGNED, {
       role:        player.role,
       description: require('./types').ROLE_DESCRIPTIONS[player.role],
       allies,
       loverNick,
+      loverId,
     });
   }
 }
@@ -274,10 +276,10 @@ function autoFillNightActions(room, gameManager) {
     if (player.role === ROLES.DOCTOR && !room.nightActions.doctorTarget) {
       room.nightActions.doctorTarget = alive[Math.floor(Math.random() * alive.length)].id;
     }
-    if (player.role === ROLES.DETECTIVE && !room.nightActions.detectiveTarget) {
+    if (player.role === ROLES.DETECTIVE && !room.nightActions.detectiveTargets[player.id]) {
       const targets = alive.filter((p) => p.id !== player.id);
       if (targets.length)
-        room.nightActions.detectiveTarget = targets[Math.floor(Math.random() * targets.length)].id;
+        room.nightActions.detectiveTargets[player.id] = targets[Math.floor(Math.random() * targets.length)].id;
     }
   }
 }

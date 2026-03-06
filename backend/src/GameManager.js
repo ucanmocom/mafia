@@ -298,9 +298,10 @@ class GameManager {
 
   /**
    * Checks if all required night actions are done.
-   * - All alive mafia members must vote
-   * - Doctor (if alive) must act
-   * - All alive detectives must act
+   * - All alive mafia members must vote (by clicking, NOT auto-filled)
+   * - Doctor (if alive) must act (by clicking, NOT auto-filled)
+   * - All alive detectives must act (by clicking, NOT auto-filled)
+   * Auto-filled actions do NOT count as complete - they only happen on timeout.
    */
   isNightComplete(roomCode) {
     const room = this.rooms.get(roomCode);
@@ -312,28 +313,33 @@ class GameManager {
     const aliveDoctor    = alive.filter((p) => p.role === ROLES.DOCTOR);
     const aliveDetective = alive.filter((p) => p.role === ROLES.DETECTIVE);
 
-    // ALL alive mafia must vote
-    if (aliveMafia.length > 0) {
+    // Count ONLY CONNECTED players (who can actually send night_action event)
+    const connectedMafia = aliveMafia.filter((p) => p.ws && p.ws.readyState === 1);
+    const connectedDoctor = aliveDoctor.filter((p) => p.ws && p.ws.readyState === 1);
+    const connectedDetective = aliveDetective.filter((p) => p.ws && p.ws.readyState === 1);
+
+    // ALL CONNECTED alive mafia must vote
+    if (connectedMafia.length > 0) {
       const votedMafia = Object.keys(room.nightActions.mafiaVotes).length;
-      if (votedMafia < aliveMafia.length) {
-        console.log(`[night] Mafia incomplete: ${votedMafia}/${aliveMafia.length} voted`);
+      if (votedMafia < connectedMafia.length) {
+        console.log(`[night] Mafia incomplete: ${votedMafia}/${connectedMafia.length} voted`);
         return false;
       }
     }
 
-    // Doctor must act
-    if (aliveDoctor.length > 0 && !room.nightActions.doctorTarget) {
+    // CONNECTED Doctor must act
+    if (connectedDoctor.length > 0 && !room.nightActions.doctorTarget) {
       console.log(`[night] Doctor has not acted`);
       return false;
     }
 
-    // All alive detectives must act
-    if (aliveDetective.length > 0) {
-      const detectiveIds = aliveDetective.map(d => d.id);
+    // ALL CONNECTED alive detectives must act
+    if (connectedDetective.length > 0) {
+      const detectiveIds = connectedDetective.map(d => d.id);
       const pickedIds = Object.keys(room.nightActions.detectiveTargets);
       const missing = detectiveIds.filter(id => !pickedIds.includes(id));
       if (missing.length > 0) {
-        console.log(`[night] Detectives incomplete: ${pickedIds.length}/${aliveDetective.length} acted. Missing: ${missing.map(id => room.players[id]?.nick).join(', ')}`);
+        console.log(`[night] Detectives incomplete: ${pickedIds.length}/${connectedDetective.length} acted. Missing: ${missing.map(id => room.players[id]?.nick).join(', ')}`);
         return false;
       }
     }

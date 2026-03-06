@@ -44,10 +44,51 @@ function DetectiveResultDisplay({ detectiveResult }) {
   )
 }
 
+function CannotVoteLoverError({ errorNick, onClose }) {
+  const { t } = useLanguage()
+  const [timer, setTimer] = useState(10)
+
+  useEffect(() => {
+    if (!errorNick) return
+    setTimer(10)
+    const id = setInterval(() => {
+      setTimer(t => {
+        if (t <= 1) { onClose?.(); return 0 }
+        return t - 1
+      })
+    }, 1000)
+    return () => clearInterval(id)
+  }, [errorNick, onClose])
+
+  if (!errorNick) return null
+
+  return (
+    <div className="detective-popup" style={{ borderColor: 'var(--red-bright)' }}>
+      <button
+        className="btn btn-ghost btn-sm"
+        style={{ position: 'absolute', top: '8px', right: '8px', padding: '4px 8px' }}
+        onClick={() => onClose?.()}
+        title="Zamknij"
+      >
+        ✕
+      </button>
+      <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>❌</div>
+      <p style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '12px', color: 'var(--text)' }}>
+        Nie możesz głosować na {errorNick}
+      </p>
+      <span className="badge" style={{ background: 'var(--red-bright)', marginBottom: '12px' }}>
+        Zakochany/a
+      </span>
+      <p className="label-cap" style={{ marginTop: '12px' }}>Zamknięcie za {timer}s</p>
+    </div>
+  )
+}
+
 export default function VotingScreen({ state, actions }) {
   const { t } = useLanguage()
-  const { players, votes, hasVoted, votedCount, playerId, round, detectiveResult } = state
+  const { players, votes, hasVoted, votedCount, playerId, round, detectiveResult, cannotVoteLoverError } = state
   const totalTime = 60
+  const [showLoverError, setShowLoverError] = useState(!!cannotVoteLoverError)
   const [timeLeft, setTimeLeft] = useState(totalTime)
 
   useEffect(() => {
@@ -55,6 +96,12 @@ export default function VotingScreen({ state, actions }) {
     const id = setInterval(() => setTimeLeft(t => Math.max(0, t - 1)), 1000)
     return () => clearInterval(id)
   }, [round])
+
+  useEffect(() => {
+    if (cannotVoteLoverError) {
+      setShowLoverError(true)
+    }
+  }, [cannotVoteLoverError])
 
   const myPlayer     = players.find(p => p.id === playerId)
   const isAlive      = myPlayer ? myPlayer.isAlive !== false : true
@@ -173,6 +220,7 @@ export default function VotingScreen({ state, actions }) {
       </div>
 
       <DetectiveResultDisplay detectiveResult={detectiveResult} />
+      <CannotVoteLoverError errorNick={showLoverError ? cannotVoteLoverError : null} onClose={() => setShowLoverError(false)} />
     </div>
   )
 }

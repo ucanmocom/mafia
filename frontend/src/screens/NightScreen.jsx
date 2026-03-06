@@ -179,6 +179,14 @@ function DetectiveNight({ targets, nightActionDone, detectiveResult, onPick, t }
       <p style={{ color: 'var(--text-dim)', fontWeight: 600 }}>{t.night.detectiveInvest}</p>
       {showResult && detectiveResult && (
         <div className={detectiveResult.isMafia ? 'detective-popup' : 'detective-popup safe'}>
+          <button
+            className="btn btn-ghost btn-sm"
+            style={{ position: 'absolute', top: '8px', right: '8px', padding: '4px 8px' }}
+            onClick={() => setShowResult(false)}
+            title="Zamknij"
+          >
+            ✕
+          </button>
           <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>{detectiveResult.isMafia ? '🔪' : '✅'}</div>
           <p style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '8px' }}>{detectiveResult.targetNick}</p>
           <span className="badge" style={{ background: detectiveResult.isMafia ? 'var(--red-bright)' : 'var(--green)', marginBottom: '12px' }}>
