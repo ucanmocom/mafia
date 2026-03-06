@@ -3,7 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 export default function VoteResultScreen({ state }) {
   const { t } = useLanguage()
   const ROLE_LABEL = t.roles
-  const { voteResult } = state
+  const { voteResult, players } = state
 
   if (!voteResult) {
     return (
@@ -18,6 +18,11 @@ export default function VoteResultScreen({ state }) {
   const { eliminatedNick, eliminatedId, role, tie, tally, loverEliminatedNick, loverEliminatedRole } = voteResult
   const tallyEntries = tally ? Object.entries(tally) : []
   const totalVotes   = tallyEntries.reduce((acc, [, v]) => acc + v, 0)
+  
+  const getPlayerNick = (id) => {
+    const player = players?.find(p => p.id === id)
+    return player?.nick || id
+  }
 
   return (
     <div className="screen">
@@ -70,8 +75,13 @@ export default function VoteResultScreen({ state }) {
             <div className="divider">{t.voteResult.votingResults}</div>
             {tallyEntries.map(([id, count]) => {
               const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
+              const nick = getPlayerNick(id)
               return (
                 <div key={id} style={{ marginBottom: '0.6rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{nick}</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{count}</span>
+                  </div>
                   <div className="vote-bar-wrap">
                     <div style={{
                       height: '100%',

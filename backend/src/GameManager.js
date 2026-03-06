@@ -565,20 +565,31 @@ class GameManager {
     );
     if (aliveMafia.length === 0) return { targetId: null, wasRandom: false };
 
+    // Policz głosy dla każdego celu
     const tally = {};
     for (const vote of Object.values(room.nightActions.mafiaVotes)) {
       tally[vote] = (tally[vote] || 0) + 1;
     }
-    const needed = Math.floor(aliveMafia.length / 2) + 1;
-    for (const [id, count] of Object.entries(tally)) {
-      if (count >= needed) return { targetId: id, wasRandom: false };
-    }
 
-    // Brak większości – losuj spośród głosowanych
     const votedTargets = Object.keys(tally);
     if (votedTargets.length === 0) return { targetId: null, wasRandom: false };
-    const randomTarget = votedTargets[Math.floor(Math.random() * votedTargets.length)];
-    return { targetId: randomTarget, wasRandom: true };
+
+    // Znajdź maksymalną liczbę głosów
+    const maxVotes = Math.max(...Object.values(tally));
+    
+    // Zbierz wszystkie cele z maksymalną liczbą głosów
+    const topTargets = Object.entries(tally)
+      .filter(([_, count]) => count === maxVotes)
+      .map(([id, _]) => id);
+
+    // Jeśli jest remis, losuj spośród tych z równą ilością głosów
+    if (topTargets.length > 1) {
+      const randomTarget = topTargets[Math.floor(Math.random() * topTargets.length)];
+      return { targetId: randomTarget, wasRandom: true };
+    }
+
+    // Jedna osoba ma największą liczbę głosów
+    return { targetId: topTargets[0], wasRandom: false };
   }
 
   // ── Public helpers ──────────────────────────────────────────────────────────

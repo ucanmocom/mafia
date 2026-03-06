@@ -105,8 +105,8 @@ export default function HomeScreen({ state, actions }) {
   }
 
   return (
-    <div className="screen" style={{ justifyContent: 'center', gap: '0' }}>
-      <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '0' }}>
+    <div className="screen" style={{ justifyContent: 'flex-start', paddingTop: '200px', overflow: 'auto' }}>
+      <div style={{ width: '100%', maxWidth: '600px', display: 'flex', flexDirection: 'column', gap: '0' }}>
 
         {/* Hero title */}
         <div style={{ marginBottom: '28px' }}>
@@ -145,7 +145,7 @@ export default function HomeScreen({ state, actions }) {
         </div>
 
         {/* CTA buttons */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '36px' }}>
           <button className="btn btn-primary" style={{ fontSize: '0.85rem', padding: '15px 20px' }} onClick={() => setMode('create')}>
             {t.home.createRoom}
           </button>
@@ -154,9 +154,67 @@ export default function HomeScreen({ state, actions }) {
           </button>
         </div>
 
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginTop: '24px', textAlign: 'center' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '48px', textAlign: 'center' }}>
           {t.home.tagline}
         </p>
+
+        {/* How to play section */}
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '28px', marginBottom: '48px' }}>
+          <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: '12px' }}>
+            {t.home.howToPlay}
+          </h2>
+          
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.6, marginBottom: '20px' }}>
+            {t.home.rulesIntro}
+          </p>
+
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '6px', marginTop: '16px' }}>
+            {t.home.winCondition}
+          </h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.5, marginBottom: '16px' }}>
+            {t.home.winConditionDesc}
+          </p>
+
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '6px', marginTop: '16px' }}>
+            {t.home.gamble}
+          </h3>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '16px' }} dangerouslySetInnerHTML={{ __html: t.home.rolesDesc }} />
+
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '12px', marginTop: '16px' }}>
+            {t.home.gameFlow}
+          </h3>
+          
+          <div style={{ marginBottom: '12px' }}>
+            <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>
+              {t.home.nightPhase}
+            </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.5 }}>
+              {t.home.nightPhaseDesc}
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '12px' }}>
+            <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>
+              {t.home.dayPhase}
+            </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.5 }}>
+              {t.home.dayPhaseDesc}
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>
+              {t.home.votingPhase}
+            </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.5 }}>
+              {t.home.votingPhaseDesc}
+            </p>
+          </div>
+
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', lineHeight: 1.6, marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+            {t.home.conclusion}
+          </p>
+        </div>
       </div>
     </div>
   )

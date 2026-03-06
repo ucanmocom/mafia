@@ -162,10 +162,15 @@ function DoctorNight({ targets, nightActionDone, onPick, t }) {
 function DetectiveNight({ targets, nightActionDone, detectiveResult, onPick, t }) {
   const [resultTimer, setResultTimer] = useState(10)
   const [showResult, setShowResult]   = useState(false)
+  const [lastResult, setLastResult]   = useState(null)
 
   useEffect(() => {
-    if (detectiveResult && !showResult) { setShowResult(true); setResultTimer(10) }
-  }, [detectiveResult, showResult])
+    if (detectiveResult && detectiveResult !== lastResult) { 
+      setShowResult(true)
+      setResultTimer(10)
+      setLastResult(detectiveResult)
+    }
+  }, [detectiveResult, lastResult])
 
   useEffect(() => {
     if (!showResult) return

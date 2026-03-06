@@ -18,6 +18,20 @@ export const translations = {
       partyGame: 'Gra towarzyska',
       joinGame: 'Dołącz do gry',
       tagline: 'Znajdź mafię · Przeżyj noc · Wygraj',
+      howToPlay: 'Jak grać w Mafię?',
+      rulesIntro: 'Mafia to popularna gra typu dedukcja społeczna, w której część graczy potajemnie należy do mafii, a reszta próbuje ją odkryć. W tej rozgrywce liczy się spryt, obserwacja innych graczy i umiejętność blefowania.',
+      winCondition: 'Cel gry',
+      winConditionDesc: 'Mieszkańcy wygrywają, gdy odkryją i wyeliminują wszystkie osoby z mafii. Mafia wygrywa, gdy liczba mafii jest równa lub większa od liczby pozostałych graczy.',
+      gamble: 'Role',
+      rolesDesc: 'W zależności od ustawień mogą pojawić się różne role:<br/>• Mafia – w nocy wybiera jedną osobę do zabicia.<br/>• Policjant – może sprawdzić, czy wybrany gracz należy do mafii.<br/>• Lekarz – może ochronić jedną osobę przed zabójstwem.<br/>• Mieszkaniec – nie ma specjalnej mocy, ale bierze udział w dyskusji i głosowaniu.',
+      gameFlow: 'Przebieg gry',
+      nightPhase: '🌙 Noc',
+      nightPhaseDesc: 'Podczas nocy specjalne role wykonują swoje akcje. Mafia wybiera cel, policjant sprawdza jednego gracza, a lekarz może kogoś ochronić.',
+      dayPhase: '🌅 Dzień',
+      dayPhaseDesc: 'Gra pokazuje, czy ktoś zginął. Następnie gracze rozmawiają, analizują zachowania innych i próbują ustalić, kto może być w mafii.',
+      votingPhase: '🗳️ Głosowanie',
+      votingPhaseDesc: 'Na końcu dnia każdy gracz głosuje na osobę, którą uważa za podejrzaną. Gracz z największą liczbą głosów zostaje wyeliminowany, a jego rola zostaje ujawniona.',
+      conclusion: 'Ta wersja Mafii została zaprojektowana jako prosta i szybka gra towarzyska online, w którą można zagrać ze znajomymi bez instalowania aplikacji. To także wygodna gra bez logowania, dzięki czemu można od razu stworzyć pokój, zaprosić znajomych i rozpocząć rozgrywkę w kilka sekund. Jeśli szukasz prostej, szybkiej i emocjonującej rozrywki dla grupy znajomych, gra Mafia online to świetny wybór na wspólną zabawę i wieczór pełen blefu, strategii i śmiechu.',
     },
 
     roles: {
@@ -32,6 +46,13 @@ export const translations = {
       doctor: 'Jesteś lekarzem. Każdej nocy możesz ochronić jedną osobę przed zabójstwem mafii.',
       detective: 'Jesteś policjantem. Każdej nocy możesz sprawdzić jedną osobę i dowiedzieć się czy jest mafią.',
       villager: 'Jesteś mieszkańcem. Nie masz specjalnych zdolności, ale możesz wpłynąć na głosowanie w dzień.',
+    },
+
+    roleHints: {
+      mafia: 'Każdej nocy musi wybrać i zabić osobę. Mafioso wie kim są inni mafiosowie.',
+      doctor: 'Każdej nocy uzdrawia wybraną osobę, chroniąc ją przed zabójstwem mafii.',
+      detective: 'Każdej nocy może sprawdzić osobę i dowiaduje się czy jest mafią czy nie.',
+      lovers: 'Dwoje graczy są w sobie zakochani. Jeśli jeden umrze, drugi automatycznie umiera. Nie mogą na siebie głosować (w dzień).',
     },
 
     lobby: {
@@ -209,6 +230,20 @@ export const translations = {
       partyGame: 'Party game',
       joinGame: 'Join game',
       tagline: 'Find the mafia · Survive the night · Win',
+      howToPlay: 'How to play Mafia?',
+      rulesIntro: 'Mafia is a popular social deduction game where some players secretly belong to the mafia while others try to discover them. In this game, strategy, observation of other players, and bluffing skills matter.',
+      winCondition: 'Game goal',
+      winConditionDesc: 'Villagers win when they discover and eliminate all mafia members. Mafia wins when the number of mafia equals or exceeds the number of remaining players.',
+      gamble: 'Roles',
+      rolesDesc: 'Depending on the settings, various roles may appear:<br/>• Mafia – chooses one person to kill each night.<br/>• Detective – can investigate if a chosen player is in the mafia.<br/>• Doctor – can protect one person from being killed.<br/>• Villager – has no special power but participates in discussion and voting.',
+      gameFlow: 'Game flow',
+      nightPhase: '🌙 Night',
+      nightPhaseDesc: 'During the night, special roles perform their actions. Mafia chooses a target, the detective investigates a player, and the doctor can protect someone.',
+      dayPhase: '🌅 Day',
+      dayPhaseDesc: 'The game shows if someone died. Then players discuss, analyze each other\'s behavior, and try to determine who might be in the mafia.',
+      votingPhase: '🗳️ Voting',
+      votingPhaseDesc: 'At the end of the day, each player votes on the person they suspect. The player with the most votes is eliminated, and their role is revealed.',
+      conclusion: 'This version of Mafia was designed as a simple and fast online party game that you can play with friends without installing an application. It\'s also a convenient game without login, so you can immediately create a room, invite friends, and start playing in a few seconds. If you\'re looking for a simple, fast, and exciting entertainment for a group of friends, Mafia online is a great choice for fun together and an evening full of bluffing, strategy, and laughter.',
     },
 
     roles: {
@@ -223,6 +258,13 @@ export const translations = {
       doctor: 'You are a doctor. Each night you can protect one person from being killed by the mafia.',
       detective: 'You are a detective. Each night you can investigate one person and find out if they are mafia.',
       villager: 'You are a villager. You have no special abilities, but you can influence the day vote.',
+    },
+
+    roleHints: {
+      mafia: 'Each night must choose and kill a person. Mafia members know who the other mafia are.',
+      doctor: 'Each night heals a chosen person, protecting them from mafia murder.',
+      detective: 'Each night can investigate a person and learns if they are mafia or not.',
+      lovers: 'Two players are in love. If one dies, the other automatically dies. They cannot vote for each other (during day).',
     },
 
     lobby: {
@@ -400,6 +442,20 @@ export const translations = {
       partyGame: 'Jeu de société',
       joinGame: 'Rejoindre une partie',
       tagline: 'Trouvez la mafia · Survivez à la nuit · Gagnez',
+      howToPlay: 'Comment jouer à la Mafia ?',
+      rulesIntro: 'La Mafia est un jeu populaire de déduction sociale où certains joueurs appartiennent secrètement à la mafia tandis que les autres essaient de la découvrir. Dans ce jeu, l\'astuce, l\'observation des autres joueurs et la capacité à bluffer comptent.',
+      winCondition: 'Objectif du jeu',
+      winConditionDesc: 'Les villageois gagnent lorsqu\'ils découvrent et éliminent tous les membres de la mafia. La mafia gagne lorsque le nombre de mafiosi est égal ou supérieur au nombre de joueurs restants.',
+      gamble: 'Rôles',
+      rolesDesc: 'Selon les paramètres, différents rôles peuvent apparaître :<br/>• Mafia – choisit une personne à tuer chaque nuit.<br/>• Détective – peut vérifier si un joueur est dans la mafia.<br/>• Médecin – peut protéger une personne de la mort.<br/>• Villageois – n\'a pas de pouvoir spécial mais participe à la discussion et au vote.',
+      gameFlow: 'Déroulement du jeu',
+      nightPhase: '🌙 Nuit',
+      nightPhaseDesc: 'Pendant la nuit, les rôles spéciaux effectuent leurs actions. La mafia choisit une cible, le détective enquête sur un joueur et le médecin peut protéger quelqu\'un.',
+      dayPhase: '🌅 Jour',
+      dayPhaseDesc: 'Le jeu indique si quelqu\'un est mort. Ensuite, les joueurs discutent, analysent le comportement des uns et des autres et tentent de déterminer qui pourrait être dans la mafia.',
+      votingPhase: '🗳️ Vote',
+      votingPhaseDesc: 'À la fin du jour, chaque joueur vote pour la personne qu\'il soupçonne. Le joueur ayant le plus de votes est éliminé et son rôle est révélé.',
+      conclusion: 'Cette version de la Mafia a été conçue comme un jeu de société en ligne simple et rapide auquel vous pouvez jouer avec des amis sans installer d\'application. C\'est aussi un jeu pratique sans connexion, vous pouvez donc créer immédiatement une salle, inviter des amis et commencer à jouer en quelques secondes. Si vous cherchez un divertissement simple, rapide et passionnant pour un groupe d\'amis, la Mafia en ligne est un excellent choix pour s\'amuser ensemble et pour une soirée remplie de bluff, de stratégie et de rires.',
     },
 
     roles: {
@@ -414,6 +470,13 @@ export const translations = {
       doctor: 'Vous êtes médecin. Chaque nuit, vous pouvez protéger une personne d\'être tuée par la mafia.',
       detective: 'Vous êtes détective. Chaque nuit, vous pouvez enquêter sur une personne et savoir si elle appartient à la mafia.',
       villager: 'Vous êtes villageois. Vous n\'avez pas de capacité spéciale, mais vous pouvez influencer le vote de jour.',
+    },
+
+    roleHints: {
+      mafia: 'Chaque nuit doit choisir et tuer une personne. Les membres de la mafia savent qui sont les autres mafiosi.',
+      doctor: 'Chaque nuit guérit une personne choisie, la protégeant du meurtre de la mafia.',
+      detective: 'Chaque nuit peut enquêter sur une personne et découvre si elle est mafia ou non.',
+      lovers: 'Deux joueurs sont amoureux. Si l\'un meurt, l\'autre meurt automatiquement. Ils ne peuvent pas voter l\'un pour l\'autre (le jour).',
     },
 
     lobby: {
@@ -591,6 +654,20 @@ export const translations = {
       partyGame: 'Partyspiel',
       joinGame: 'Spiel beitreten',
       tagline: 'Finde die Mafia · Überlebe die Nacht · Gewinne',
+      howToPlay: 'Wie spielt man Mafia?',
+      rulesIntro: 'Mafia ist ein beliebtes Social-Deduction-Spiel, bei dem einige Spieler heimlich zur Mafia gehören und die anderen versuchen, sie zu entdecken. Bei diesem Spiel zählen Strategie, Beobachtung anderer Spieler und Fähigkeiten im Bluffen.',
+      winCondition: 'Spielziel',
+      winConditionDesc: 'Dorfbewohner gewinnen, wenn sie alle Mafiamitglieder entdecken und eliminieren. Die Mafia gewinnt, wenn die Anzahl der Mafiosi gleich oder größer ist als die Anzahl der verbleibenden Spieler.',
+      gamble: 'Rollen',
+      rolesDesc: 'Je nach Einstellungen können verschiedene Rollen erscheinen:<br/>• Mafia – wählt jede Nacht eine Person zum Töten.<br/>• Detektiv – kann überprüfen, ob ein ausgewählter Spieler zur Mafia gehört.<br/>• Arzt – kann eine Person vor dem Tod schützen.<br/>• Dorfbewohner – hat keine spezielle Kraft, nimmt aber an Diskussionen und Abstimmungen teil.',
+      gameFlow: 'Spielablauf',
+      nightPhase: '🌙 Nacht',
+      nightPhaseDesc: 'Während der Nacht führen spezielle Rollen ihre Aktionen aus. Die Mafia wählt ein Ziel, der Detektiv untersucht einen Spieler und der Arzt kann jemanden schützen.',
+      dayPhase: '🌅 Tag',
+      dayPhaseDesc: 'Das Spiel zeigt, ob jemand gestorben ist. Dann diskutieren die Spieler, analysieren das Verhalten anderer und versuchen zu bestimmen, wer in der Mafia sein könnte.',
+      votingPhase: '🗳️ Abstimmung',
+      votingPhaseDesc: 'Am Ende des Tages stimmt jeder Spieler über die Person ab, die er verdächtigt. Der Spieler mit den meisten Stimmen wird eliminiert und seine Rolle wird enthüllt.',
+      conclusion: 'Diese Version von Mafia wurde als einfaches und schnelles Online-Partyspiel konzipiert, das du mit Freunden spielen kannst, ohne eine Anwendung zu installieren. Es ist auch ein bequemes Spiel ohne Anmeldung, sodass du sofort einen Raum erstellen, Freunde einladen und in wenigen Sekunden spielen kannst. Wenn du nach einfacher, schneller und aufregender Unterhaltung für eine Freundesgruppe suchst, ist Mafia online eine großartige Wahl zum gemeinsamen Spaß und einen Abend voller Bluff, Strategie und Lachen.',
     },
 
     roles: {
@@ -605,6 +682,13 @@ export const translations = {
       doctor: 'Du bist Arzt. Jede Nacht kannst du eine Person vor dem Mord durch die Mafia schützen.',
       detective: 'Du bist Detektiv. Jede Nacht kannst du eine Person untersuchen und herausfinden, ob sie zur Mafia gehört.',
       villager: 'Du bist Dorfbewohner. Du hast keine besonderen Fähigkeiten, aber du kannst die Tagesabstimmung beeinflussen.',
+    },
+
+    roleHints: {
+      mafia: 'Muss jede Nacht eine Person auswählen und töten. Mafiamitglieder kennen sich gegenseitig.',
+      doctor: 'Heilt jede Nacht eine ausgewählte Person und schützt sie vor Mafia-Mord.',
+      detective: 'Kann jede Nacht eine Person untersuchen und erfährt, ob sie Mafia ist oder nicht.',
+      lovers: 'Zwei Spieler sind verliebt. Wenn einer stirbt, stirbt der andere automatisch. Sie können während des Tages nicht füreinander abstimmen.',
     },
 
     lobby: {

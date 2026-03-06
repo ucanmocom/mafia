@@ -1,10 +1,79 @@
 import { useState } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
 
+function RoleHintButton({ hint }) {
+  const [showModal, setShowModal] = useState(false)
+
+  return (
+    <>
+      <button
+        style={{
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          color: 'var(--text-muted)',
+          fontSize: '0.9rem',
+          padding: '0 4px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '20px',
+        }}
+        onClick={() => setShowModal(true)}
+        title="Informacja o roli"
+      >
+        i
+      </button>
+      {showModal && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.7)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+            }}
+            onClick={() => setShowModal(false)}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              padding: '24px',
+              maxWidth: '90%',
+              width: '320px',
+              maxHeight: '80vh',
+              overflow: 'auto',
+              zIndex: 1001,
+              boxShadow: 'var(--shadow-xl)',
+            }}
+          >
+            <p style={{ color: 'var(--text)', lineHeight: '1.6', margin: 0 }}>
+              {hint}
+            </p>
+          </div>
+        </>
+      )}
+    </>
+  )
+}
+
 export default function LobbyScreen({ state, actions }) {
   const { t } = useLanguage()
   const { roomCode, players, settings, isHost, hostId, playerId } = state
   const [localSettings, setLocalSettings] = useState(settings)
+  const [showCopiedToast, setShowCopiedToast] = useState(false)
 
   const alivePlayers = players.filter(p => p.isConnected !== false)
   const totalSpecial =
@@ -23,6 +92,12 @@ export default function LobbyScreen({ state, actions }) {
 
   const copyCode = () => {
     navigator.clipboard.writeText(roomCode).catch(() => {})
+  }
+
+  const copyInviteLink = () => {
+    const baseUrl = window.location.origin
+    const inviteUrl = `${baseUrl}/?roomCode=${roomCode}`
+    navigator.clipboard.writeText(inviteUrl).catch(() => {})
   }
 
   return (
@@ -44,6 +119,56 @@ export default function LobbyScreen({ state, actions }) {
             {t.lobby.shareCopy}
           </p>
         </div>
+
+        {/* Invite link button */}
+        <button
+          onClick={() => {
+            const baseUrl = window.location.origin
+            const inviteUrl = `${baseUrl}/?roomCode=${roomCode}`
+            const fullInviteText = `Zagraj ze mną w Mafia Online\n${inviteUrl}\n(${roomCode})`
+            navigator.clipboard.writeText(fullInviteText).catch(() => {})
+            setShowCopiedToast(true)
+            setTimeout(() => setShowCopiedToast(false), 5000)
+          }}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-muted)',
+            fontSize: '0.85rem',
+            cursor: 'pointer',
+            padding: '8px 0',
+            margin: '0',
+            textAlign: 'left',
+            transition: 'color 0.2s ease',
+          }}
+          onMouseEnter={(e) => e.target.style.color = 'var(--brand)'}
+          onMouseLeave={(e) => e.target.style.color = 'var(--text-muted)'}
+          title="Skopiuj link zaproszenia"
+        >
+          🔗 Skopiuj link
+        </button>
+
+        {/* Toast notification */}
+        {showCopiedToast && (
+          <div
+            style={{
+              position: 'fixed',
+              bottom: '24px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: 'var(--brand)',
+              color: 'white',
+              padding: '12px 20px',
+              borderRadius: 'var(--radius)',
+              fontSize: '0.85rem',
+              zIndex: 1000,
+              boxShadow: 'var(--shadow-lg)',
+              animation: 'fadeIn 0.2s ease',
+            }}
+          >
+            ✓ Skopiowano do schowka
+          </div>
+        )}
 
         {/* Stats strip */}
         <div className="stats-strip">
@@ -104,6 +229,7 @@ export default function LobbyScreen({ state, actions }) {
                 value={localSettings.mafiaCount}
                 min={1}
                 max={Math.max(1, Math.floor(alivePlayers.length / 3))}
+                hint={t.roleHints.mafia}
                 onChange={v => handleSettingsChange('mafiaCount', v)}
               />
               {localSettings.mafiaCount > 1 && alivePlayers.length < 6 && (
@@ -116,6 +242,7 @@ export default function LobbyScreen({ state, actions }) {
                 value={localSettings.detectiveCount}
                 min={0}
                 max={2}
+                hint={t.roleHints.detective}
                 onChange={v => handleSettingsChange('detectiveCount', v)}
               />
               <SettingRow
@@ -123,6 +250,7 @@ export default function LobbyScreen({ state, actions }) {
                 value={localSettings.doctorCount}
                 min={0}
                 max={2}
+                hint={t.roleHints.doctor}
                 onChange={v => handleSettingsChange('doctorCount', v)}
               />
               <SettingRow
@@ -130,6 +258,7 @@ export default function LobbyScreen({ state, actions }) {
                 value={localSettings.loversCount ?? 0}
                 min={0}
                 max={1}
+                hint={t.roleHints.lovers}
                 onChange={v => handleSettingsChange('loversCount', v)}
               />
             </div>
@@ -143,6 +272,7 @@ export default function LobbyScreen({ state, actions }) {
                 value={Math.round((localSettings.dayDuration || 120000) / 1000)}
                 min={30}
                 max={300}
+                step={10}
                 onChange={v => handleSettingsChange('dayDuration', v * 1000)}
               />
               <SettingRow
@@ -150,6 +280,7 @@ export default function LobbyScreen({ state, actions }) {
                 value={Math.round((localSettings.nightDuration || 60000) / 1000)}
                 min={30}
                 max={180}
+                step={10}
                 onChange={v => handleSettingsChange('nightDuration', v * 1000)}
               />
             </div>
@@ -192,21 +323,24 @@ export default function LobbyScreen({ state, actions }) {
   )
 }
 
-function SettingRow({ label, value, min, max, onChange }) {
+function SettingRow({ label, value, min, max, step = 1, hint, onChange }) {
   return (
     <div className="setting-row">
-      <span className="setting-row-label">{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <span className="setting-row-label">{label}</span>
+        {hint && <RoleHintButton hint={hint} />}
+      </div>
       <button
         className="btn btn-ghost btn-sm"
         style={{ padding: '6px 10px', minWidth: '32px' }}
-        onClick={() => onChange(Math.max(min, value - 1))}
+        onClick={() => onChange(Math.max(min, value - step))}
         disabled={value <= min}
       >−</button>
       <span className="setting-row-val">{value}</span>
       <button
         className="btn btn-ghost btn-sm"
         style={{ padding: '6px 10px', minWidth: '32px' }}
-        onClick={() => onChange(Math.min(max, value + 1))}
+        onClick={() => onChange(Math.min(max, value + step))}
         disabled={value >= max}
       >+</button>
     </div>

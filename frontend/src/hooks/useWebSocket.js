@@ -5,8 +5,8 @@ const WS_URL = (() => {
   if (import.meta.env.DEV) {
     return 'ws://localhost:3001'
   }
-  // In production: connect to Coolify backend
-  return 'wss://gckc0s4o4cwgg4c4ss48csgc.167.86.79.107.sslip.io'
+  // In production: use VITE_WS_URL from environment variables (set in Cloudflare)
+  return import.meta.env.VITE_WS_URL
 })()
 
 /**
