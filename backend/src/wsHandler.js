@@ -555,7 +555,10 @@ function handleConnection(ws, gameManager) {
       case EVENTS.VOTE: {
         if (!currentRoomCode) return send(ws, EVENTS.ERROR, { message: 'Nie jesteś w pokoju.' });
         const result = gameManager.recordVote(currentRoomCode, currentPlayerId, data.targetId);
-        if (result.error) return send(ws, EVENTS.ERROR, { message: result.error });
+        if (result.error) {
+          // Send error back to voter - they can try again
+          return send(ws, EVENTS.ERROR, { message: result.error });
+        }
 
         const room = result.room;
 
@@ -564,11 +567,14 @@ function handleConnection(ws, gameManager) {
         for (const targetId of Object.values(room.votes)) {
           tally[targetId] = (tally[targetId] || 0) + 1;
         }
-        broadcast(room, EVENTS.VOTE_UPDATE, { tally, votedCount: Object.keys(room.votes).length });
+        const alive = Object.values(room.players).filter((p) => p.isAlive);
+        const votedCount = Object.keys(room.votes).length;
+        console.log(`[vote] Player ${room.players[currentPlayerId]?.nick} voted for ${room.players[data.targetId]?.nick || 'skip'}. Votes: ${votedCount}/${alive.length}`);
+        broadcast(room, EVENTS.VOTE_UPDATE, { tally, votedCount });
 
         // If everyone alive voted → resolve immediately
-        const aliveCount = Object.values(room.players).filter((p) => p.isAlive).length;
-        if (Object.keys(room.votes).length >= aliveCount) {
+        if (votedCount >= alive.length) {
+          console.log(`[vote] All players voted! Resolving voting.`);
           doResolveVoting(room, gameManager);
         }
         break;

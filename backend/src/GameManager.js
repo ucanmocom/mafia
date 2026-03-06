@@ -298,7 +298,9 @@ class GameManager {
 
   /**
    * Checks if all required night actions are done.
-   * Mafia: majority vote (>50%) among alive mafia members.
+   * - All alive mafia members must vote
+   * - Doctor (if alive) must act
+   * - All alive detectives must act
    */
   isNightComplete(roomCode) {
     const room = this.rooms.get(roomCode);
@@ -310,19 +312,30 @@ class GameManager {
     const aliveDoctor    = alive.filter((p) => p.role === ROLES.DOCTOR);
     const aliveDetective = alive.filter((p) => p.role === ROLES.DETECTIVE);
 
-    // Mafia majority
+    // ALL alive mafia must vote
     if (aliveMafia.length > 0) {
-      const mafiaChoice = this._getMafiaMajorityTarget(room);
-      if (!mafiaChoice) return false;
+      const votedMafia = Object.keys(room.nightActions.mafiaVotes).length;
+      if (votedMafia < aliveMafia.length) {
+        console.log(`[night] Mafia incomplete: ${votedMafia}/${aliveMafia.length} voted`);
+        return false;
+      }
     }
 
     // Doctor must act
-    if (aliveDoctor.length > 0 && !room.nightActions.doctorTarget) return false;
+    if (aliveDoctor.length > 0 && !room.nightActions.doctorTarget) {
+      console.log(`[night] Doctor has not acted`);
+      return false;
+    }
 
     // All alive detectives must act
     if (aliveDetective.length > 0) {
-      const picked = Object.keys(room.nightActions.detectiveTargets).length;
-      if (picked < aliveDetective.length) return false;
+      const detectiveIds = aliveDetective.map(d => d.id);
+      const pickedIds = Object.keys(room.nightActions.detectiveTargets);
+      const missing = detectiveIds.filter(id => !pickedIds.includes(id));
+      if (missing.length > 0) {
+        console.log(`[night] Detectives incomplete: ${pickedIds.length}/${aliveDetective.length} acted. Missing: ${missing.map(id => room.players[id]?.nick).join(', ')}`);
+        return false;
+      }
     }
 
     return true;

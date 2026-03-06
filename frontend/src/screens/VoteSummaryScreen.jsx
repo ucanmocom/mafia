@@ -3,15 +3,8 @@ import { useLanguage } from '../contexts/LanguageContext'
 
 export default function VoteSummaryScreen({ state }) {
   const { t } = useLanguage()
-  const { voteDisplay, voteTally, players } = state
+  const { voteDisplay, voteTally } = state
   const [timeLeft, setTimeLeft] = useState(10)
-
-  // Helper: map player ID to nick
-  const getPlayerNick = (id) => {
-    if (id === 'skip') return t.voteSummary.skip
-    const player = players.find(p => p.id === id)
-    return player ? player.nick : id
-  }
 
   useEffect(() => {
     setTimeLeft(10)
@@ -19,14 +12,11 @@ export default function VoteSummaryScreen({ state }) {
     return () => clearInterval(id)
   }, [])
 
-  const voteEntries = Object.entries(voteDisplay).map(([voter, target]) => ({
-    voter: getPlayerNick(voter),
-    target: getPlayerNick(target)
-  }))
+  const voteEntries = Object.entries(voteDisplay).map(([voter, target]) => ({ voter, target }))
 
   const tallyEntries = Object.entries(voteTally).map(([id, count]) => ({
     id,
-    target: getPlayerNick(id),
+    target: id === 'skip' ? t.voteSummary.skip : id,
     count,
   })).sort((a, b) => b.count - a.count)
 

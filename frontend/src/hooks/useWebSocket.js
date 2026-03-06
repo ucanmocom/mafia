@@ -1,7 +1,11 @@
 import { useEffect, useRef, useCallback } from 'react'
 
-const WS_URL = import.meta.env.VITE_WS_URL || (() => {
-  // Construct WebSocket URL from current location
+const WS_URL = (() => {
+  // In dev: connect to backend on port 3001
+  if (import.meta.env.DEV) {
+    return 'ws://localhost:3001'
+  }
+  // In production: use same host as frontend
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
   const host = window.location.host
   return `${protocol}//${host}`

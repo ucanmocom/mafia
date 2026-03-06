@@ -1,45 +1,24 @@
 {
-  "D4T8ZW": {
-    "code": "D4T8ZW",
-    "hostId": "7de21ad2-6532-4129-8e95-a3b896d7a073",
+  "Z6MZBG": {
+    "code": "Z6MZBG",
+    "hostId": "120f2e58-710e-44b7-877b-498954549c36",
     "players": {
-      "aeda6012-852d-432c-806d-9bb97e39427c": {
-        "id": "aeda6012-852d-432c-806d-9bb97e39427c",
-        "nick": "mgielka",
+      "120f2e58-710e-44b7-877b-498954549c36": {
+        "id": "120f2e58-710e-44b7-877b-498954549c36",
+        "nick": "heh",
         "role": null,
         "isAlive": true,
-        "isConnected": false,
-        "isHost": false
-      },
-      "7de21ad2-6532-4129-8e95-a3b896d7a073": {
-        "id": "7de21ad2-6532-4129-8e95-a3b896d7a073",
-        "nick": "nozyczki",
-        "role": null,
-        "isAlive": true,
-        "isConnected": false,
+        "isConnected": true,
         "isHost": true
-      },
-      "fe878cb4-d912-4509-820c-db433cb9bf1e": {
-        "id": "fe878cb4-d912-4509-820c-db433cb9bf1e",
-        "nick": "roza",
-        "role": null,
-        "isAlive": true,
-        "isConnected": false,
-        "isHost": false
-      },
-      "e691a3e8-555d-44b3-9ee7-983b654122d6": {
-        "id": "e691a3e8-555d-44b3-9ee7-983b654122d6",
-        "nick": "hih",
-        "role": null,
-        "isAlive": true,
-        "isConnected": false,
-        "isHost": false
       }
     },
     "settings": {
       "mafiaCount": 1,
       "doctorCount": 1,
-      "detectiveCount": 1
+      "detectiveCount": 1,
+      "loversCount": 0,
+      "dayDuration": 120000,
+      "nightDuration": 60000
     },
     "phase": "lobby",
     "round": 0,
@@ -52,8 +31,9 @@
     "nightResult": null,
     "voteResult": null,
     "winner": null,
-    "createdAt": 1772209493855,
+    "createdAt": 1772817550943,
     "hostMigrateTimer": null,
-    "skipDayVotes": {}
+    "skipDayVotes": {},
+    "loverIds": null
   }
 }

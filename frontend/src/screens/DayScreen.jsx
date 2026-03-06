@@ -35,6 +35,14 @@ function DetectiveResultDisplay({ detectiveResult }) {
 
   return (
     <div className={`detective-popup${isMafia ? '' : ' safe'}`}>
+      <button
+        className="btn btn-ghost btn-sm"
+        style={{ position: 'absolute', top: '8px', right: '8px', padding: '4px 8px' }}
+        onClick={() => setShowResult(false)}
+        title="Zamknij"
+      >
+        ✕
+      </button>
       <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>
         {isMafia ? '🔪' : '✅'}
       </div>
