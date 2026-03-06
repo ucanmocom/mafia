@@ -56,10 +56,10 @@ wss.on('connection', (ws) => {
 
 // ─── Server start ─────────────────────────────────────────────────────────────
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`[server] Mafia Backend uruchomiony na porcie ${PORT}`);
-  console.log(`[server] WebSocket: ws://localhost:${PORT}`);
-  console.log(`[server] Health:    http://localhost:${PORT}/health`);
+  console.log(`[server] WebSocket: ws://0.0.0.0:${PORT}`);
+  console.log(`[server] Health:    http://0.0.0.0:${PORT}/health`);
 });
 
 // ─── Graceful shutdown ────────────────────────────────────────────────────────
