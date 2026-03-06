@@ -1,20 +1,30 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, Suspense, lazy } from 'react'
 import { useWebSocket } from './hooks/useWebSocket'
 import { useLanguage } from './contexts/LanguageContext'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import HomeScreen       from './screens/HomeScreen'
 import LobbyScreen      from './screens/LobbyScreen'
 import RoleRevealScreen from './screens/RoleRevealScreen'
-import NightScreen      from './screens/NightScreen'
-import NightResultScreen from './screens/NightResultScreen'
-import DayScreen        from './screens/DayScreen'
-import VotingScreen     from './screens/VotingScreen'
-import VoteSummaryScreen from './screens/VoteSummaryScreen'
-import VoteResultScreen from './screens/VoteResultScreen'
-import GameOverScreen   from './screens/GameOverScreen'
+// Lazy load game screens
+const NightScreen       = lazy(() => import('./screens/NightScreen'))
+const NightResultScreen = lazy(() => import('./screens/NightResultScreen'))
+const DayScreen        = lazy(() => import('./screens/DayScreen'))
+const VotingScreen     = lazy(() => import('./screens/VotingScreen'))
+const VoteSummaryScreen = lazy(() => import('./screens/VoteSummaryScreen'))
+const VoteResultScreen = lazy(() => import('./screens/VoteResultScreen'))
+const GameOverScreen   = lazy(() => import('./screens/GameOverScreen'))
 import Toast            from './components/Toast'
 import RoleChat         from './components/RoleChat'
 import GameHUD          from './components/GameHUD'
+
+const LoadingFallback = () => (
+  <div className="screen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>
+      <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⏳</div>
+      <p>Ładowanie...</p>
+    </div>
+  </div>
+)
 
 const STORAGE_KEY = 'mafia_session'
 
@@ -86,6 +96,25 @@ export default function App() {
       }))
     }
   }, [state.roomCode, state.playerId, state.nick])
+
+  // ── Load Google Analytics 4 (lazy) ─────────────────────────────────────────
+  useEffect(() => {
+    // Załaduj GA4 tylko raz po mountowaniu
+    if (window.gtag) return
+
+    // Utwórz window.dataLayer
+    window.dataLayer = window.dataLayer || []
+    function gtag() { window.dataLayer.push(arguments) }
+    gtag('js', new Date())
+    gtag('config', 'G-BQKWBED5QG')
+    window.gtag = gtag
+
+    // Dynamicznie załaduj skrypt Google Analytics asynchronicznie (nie blokuje)
+    const script = document.createElement('script')
+    script.async = true
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-BQKWBED5QG'
+    document.head.appendChild(script)
+  }, [])
 
   // ── WebSocket message handler ─────────────────────────────────────────────
   const handleMessage = useCallback((event, data) => {
