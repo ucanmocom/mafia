@@ -98,13 +98,6 @@ export default function GameHUD({ state }) {
           </span>
         </>
       )}
-
-      {/* Logo */}
-      <img
-        src="/image.png"
-        alt="Mafia"
-        style={{ height: 96, width: 96, objectFit: 'contain', marginLeft: 'auto', opacity: 0.85, borderRadius: '10px' }}
-      />
     </div>
   )
 }

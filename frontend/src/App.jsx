@@ -76,7 +76,7 @@ export default function App() {
   const [state, setState] = useState(INITIAL_STATE)
   const [toast, setToast] = useState(null)
   const stateRef = useRef(state)
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   stateRef.current = state
   const tRef = useRef(t)
   tRef.current = t
@@ -421,6 +421,133 @@ export default function App() {
     setNick: (nick) => setState(s => ({ ...s, nick })),
   }
 
+  // ── SEO: dynamic lang / title / meta tags ───────────────────────────────
+  useEffect(() => {
+    if (!t) return
+
+    const currentLang = lang || 'pl'
+    document.documentElement.lang = currentLang
+
+    const seo = t.seo || {}
+
+    if (seo.title) {
+      document.title = seo.title
+    }
+
+    // Set canonical URL
+    let canonical = document.querySelector('link[rel="canonical"]')
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.rel = 'canonical'
+      document.head.appendChild(canonical)
+    }
+    canonical.href = `${window.location.origin}/${currentLang}`
+
+    const metaDescription = document.querySelector('meta[name="description"]')
+    if (metaDescription && seo.description) {
+      metaDescription.setAttribute('content', seo.description)
+    }
+
+    const metaKeywords = document.querySelector('meta[name="keywords"]')
+    if (metaKeywords && seo.keywords) {
+      metaKeywords.setAttribute('content', seo.keywords)
+    }
+
+    const ogTitle = document.querySelector('meta[property="og:title"]')
+    if (ogTitle && seo.title) {
+      ogTitle.setAttribute('content', seo.title)
+    }
+
+    const ogDescription = document.querySelector('meta[property="og:description"]')
+    if (ogDescription && seo.description) {
+      ogDescription.setAttribute('content', seo.description)
+    }
+
+    // Set og:url 
+    let ogUrl = document.querySelector('meta[property="og:url"]')
+    if (!ogUrl) {
+      ogUrl = document.createElement('meta')
+      ogUrl.setAttribute('property', 'og:url')
+      document.head.appendChild(ogUrl)
+    }
+    ogUrl.setAttribute('content', `${window.location.origin}/${currentLang}`)
+
+    // Set og:locale based on current language
+    let ogLocale = document.querySelector('meta[property="og:locale"]')
+    if (!ogLocale) {
+      ogLocale = document.createElement('meta')
+      ogLocale.setAttribute('property', 'og:locale')
+      document.head.appendChild(ogLocale)
+    }
+    const localeMap = {
+      'pl': 'pl_PL',
+      'en': 'en_US', 
+      'fr': 'fr_FR',
+      'de': 'de_DE'
+    }
+    ogLocale.setAttribute('content', localeMap[currentLang] || 'pl_PL')
+
+    // Update hreflang links
+    const baseUrl = window.location.origin
+    const languages = ['pl', 'en', 'fr', 'de']
+    
+    // Remove all existing hreflang links to avoid duplicates
+    document.querySelectorAll('link[hreflang]').forEach(link => {
+      if (link.hreflang !== 'x-default') {
+        link.remove()
+      }
+    })
+    
+    // Add fresh hreflang links
+    languages.forEach(langCode => {
+      const hreflangLink = document.createElement('link')
+      hreflangLink.rel = 'alternate'
+      hreflangLink.hreflang = langCode
+      hreflangLink.href = `${baseUrl}/${langCode}`
+      document.head.appendChild(hreflangLink)
+    })
+
+    // Update x-default hreflang
+    let xDefaultLink = document.querySelector('link[hreflang="x-default"]')
+    if (!xDefaultLink) {
+      xDefaultLink = document.createElement('link')
+      xDefaultLink.rel = 'alternate'
+      xDefaultLink.hreflang = 'x-default'
+      document.head.appendChild(xDefaultLink)
+    }
+    xDefaultLink.href = `${baseUrl}/en`
+
+    // Add JSON-LD structured data
+    let jsonLdScript = document.querySelector('#json-ld-script')
+    if (!jsonLdScript) {
+      jsonLdScript = document.createElement('script')
+      jsonLdScript.id = 'json-ld-script'
+      jsonLdScript.type = 'application/ld+json'
+      document.head.appendChild(jsonLdScript)
+    }
+    
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": seo.title || "Mafia online",
+      "description": seo.description,
+      "url": `${baseUrl}/${currentLang}`,
+      "applicationCategory": "Game",
+      "genre": "Social Deduction",
+      "gamePlatform": "Web Browser",
+      "operatingSystem": "Any",
+      "inLanguage": currentLang,
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    
+    jsonLdScript.textContent = JSON.stringify(structuredData)
+  }, [lang, t])
+
   // ── Screen router ─────────────────────────────────────────────────────────
   const screenProps = { state, actions, showToast }
 
@@ -444,14 +571,6 @@ export default function App() {
     <>
       <LanguageSwitcher />
       <GameHUD state={state} />
-      {/* Logo visible when GameHUD bar is hidden (home, lobby, role_reveal, game_over) */}
-      {!['night','night_result','day','voting','vote_summary','vote_result'].includes(state.phase) && (
-        <img
-          src="/image.png"
-          alt="Mafia"
-          style={{ position: 'fixed', top: 10, right: 12, height: 108, width: 108, objectFit: 'contain', opacity: 0.8, borderRadius: '10px', zIndex: 900 }}
-        />
-      )}
       {renderScreen()}
       {['night', 'day', 'voting'].includes(state.phase) && state.role && state.role !== 'villager' && (
         <RoleChat

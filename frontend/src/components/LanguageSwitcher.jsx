@@ -24,8 +24,8 @@ export default function LanguageSwitcher() {
       ref={ref}
       style={{
         position: 'fixed',
-        top: 8,
-        left: 8,
+        top: 24,
+        left: 24,
         zIndex: 1100,
         userSelect: 'none',
       }}
@@ -36,14 +36,14 @@ export default function LanguageSwitcher() {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '5px',
+          gap: '8px',
           background: 'rgba(12,8,8,0.88)',
           border: '1px solid rgba(139,26,22,0.45)',
           borderRadius: '8px',
-          padding: '5px 9px',
+          padding: '8px 12px',
           cursor: 'pointer',
           color: '#8B1A16',
-          fontSize: '0.78rem',
+          fontSize: '0.9rem',
           fontWeight: 700,
           backdropFilter: 'blur(6px)',
           transition: 'border-color .15s, color .15s, background .15s',
@@ -52,7 +52,7 @@ export default function LanguageSwitcher() {
         onMouseEnter={e => { e.currentTarget.style.borderColor = '#8B1A16'; e.currentTarget.style.background = 'rgba(139,26,22,0.12)' }}
         onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(139,26,22,0.45)'; e.currentTarget.style.background = 'rgba(12,8,8,0.88)' }}
       >
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+        <svg width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
           <circle cx="7" cy="7" r="6" stroke="#8B1A16" strokeWidth="1.2"/>
           <ellipse cx="7" cy="7" rx="2.6" ry="6" stroke="#8B1A16" strokeWidth="1.2"/>
           <line x1="1" y1="7" x2="13" y2="7" stroke="#8B1A16" strokeWidth="1.2"/>
@@ -85,10 +85,10 @@ export default function LanguageSwitcher() {
                 width: '100%',
                 background: l.code === lang ? 'var(--surface2)' : 'none',
                 border: 'none',
-                padding: '9px 14px',
+                padding: '10px 14px',
                 cursor: 'pointer',
                 color: l.code === lang ? 'var(--text)' : 'var(--text-muted)',
-                fontSize: '0.82rem',
+                fontSize: '0.95rem',
                 fontWeight: l.code === lang ? 700 : 500,
                 textAlign: 'left',
                 transition: 'background .1s',
@@ -96,8 +96,7 @@ export default function LanguageSwitcher() {
               onMouseEnter={e => { if (l.code !== lang) e.currentTarget.style.background = 'var(--surface2)' }}
               onMouseLeave={e => { if (l.code !== lang) e.currentTarget.style.background = 'none' }}
             >
-              <span style={{ fontSize: '1.1rem' }}>{l.flag}</span>
-              <span>{l.label}</span>
+              <span style={{ fontSize: '0.95rem', fontWeight: 600 }}>{l.label}</span>
               {l.code === lang && (
                 <span style={{ marginLeft: 'auto', color: 'var(--text-muted)', fontSize: '0.7rem' }}>✓</span>
               )}

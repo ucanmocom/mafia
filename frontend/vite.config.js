@@ -4,10 +4,20 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: '0.0.0.0',
     port: 3000,
     proxy: {
       '/join': 'http://localhost:3001',
       '/health': 'http://localhost:3001',
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+      },
+    },
+  },
+  // Enable historyApiFallback for SPA routing
+  appType: 'spa',
 })

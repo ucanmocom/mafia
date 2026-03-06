@@ -32,6 +32,25 @@ export const translations = {
       votingPhase: '🗳️ Głosowanie',
       votingPhaseDesc: 'Na końcu dnia każdy gracz głosuje na osobę, którą uważa za podejrzaną. Gracz z największą liczbą głosów zostaje wyeliminowany, a jego rola zostaje ujawniona.',
       conclusion: 'Ta wersja Mafii została zaprojektowana jako prosta i szybka gra towarzyska online, w którą można zagrać ze znajomymi bez instalowania aplikacji. To także wygodna gra bez logowania, dzięki czemu można od razu stworzyć pokój, zaprosić znajomych i rozpocząć rozgrywkę w kilka sekund. Jeśli szukasz prostej, szybkiej i emocjonującej rozrywki dla grupy znajomych, gra Mafia online to świetny wybór na wspólną zabawę i wieczór pełen blefu, strategii i śmiechu.',
+
+      faqTitle: 'FAQ – najczęstsze pytania o Mafia online',
+      faqIntro: 'Poniżej znajdziesz odpowiedzi na najczęstsze pytania o naszą grę towarzyską Mafia online.',
+      faq1Q: 'Czy Mafia online jest darmowa?',
+      faq1A: 'Tak. Gra Mafia online jest całkowicie darmową grą towarzyską w przeglądarce – to mafia online za darmo, bez logowania, bez instalacji i bez limitu rozgrywek.',
+      faq2Q: 'Ile osób może grać w tę grę towarzyską online na imprezę?',
+      faq2A: 'Mafia online najlepiej sprawdza się jako gra towarzyska online na imprezę i wieczór ze znajomymi. W jednym pokoju może grać kilka–kilkanaście osób (zalecane minimum to 4 graczy).',
+      faq3Q: 'Czy mogę grać w mafię online z przyjaciółmi z innych krajów?',
+      faq3A: 'Tak. Gra jest wielojęzyczna – interfejs dostępny jest po polsku, angielsku, francusku i niemiecku, więc Mafia online świetnie sprawdza się jako gra towarzyska dla międzynarodowych grup.',
+      faq4Q: 'Na jakich urządzeniach działają te gry online?',
+      faq4A: 'Mafia online działa w przeglądarce na komputerze, laptopie i telefonie. Wystarczy link do pokoju – to prosta gra online, która nie wymaga instalacji ani konta.',
+    },
+
+    seo: {
+      title: 'Mafia online – gra towarzyska online | Gry towarzyskie',
+      description:
+        'Mafia online to darmowa gra towarzyska w przeglądarce. Stwórz pokój, zaproś znajomych i zagraj w mafię online po polsku – bez logowania i instalacji.',
+      keywords:
+        'mafia online, gra mafia online, gra towarzyska, gry towarzyskie, gra imprezowa, gry imprezowe, gra w mafię, mafia game online, social deduction game, online gry, gry online ze znajomymi, darmowa gra online, gra przeglądarkowa, multiplayer',
     },
 
     roles: {
@@ -244,6 +263,25 @@ export const translations = {
       votingPhase: '🗳️ Voting',
       votingPhaseDesc: 'At the end of the day, each player votes on the person they suspect. The player with the most votes is eliminated, and their role is revealed.',
       conclusion: 'This version of Mafia was designed as a simple and fast online party game that you can play with friends without installing an application. It\'s also a convenient game without login, so you can immediately create a room, invite friends, and start playing in a few seconds. If you\'re looking for a simple, fast, and exciting entertainment for a group of friends, Mafia online is a great choice for fun together and an evening full of bluffing, strategy, and laughter.',
+
+      faqTitle: 'FAQ – Mafia online party game',
+      faqIntro: 'Below you\'ll find answers to the most common questions about our Mafia online social deduction game.',
+      faq1Q: 'Is Mafia online free to play?',
+      faq1A: 'Yes. Mafia online is a completely free browser party game – a free mafia online game with no login, no installation and no game limits.',
+      faq2Q: 'How many players can join this online party game for friends?',
+      faq2A: 'Mafia online works best as a social party game for a group of friends or an online party night. One room can host several up to a dozen players (we recommend at least 4 players).',
+      faq3Q: 'Can I play this mafia online game with friends from other countries?',
+      faq3A: 'Yes. The game is multilingual – the interface is available in Polish, English, French and German, so Mafia online is perfect as a party game for international groups.',
+      faq4Q: 'On which devices can I play this online game?',
+      faq4A: 'Mafia online runs in the browser on desktop, laptop and mobile. You only need a room link – it\'s a simple online game without download or account.',
+    },
+
+    seo: {
+      title: 'Mafia online – free party game | Social deduction browser game',
+      description:
+        'Mafia online is a free social deduction party game in your browser. Create a room, invite friends and play Mafia online in English – no download, no login.',
+      keywords:
+        'mafia online, mafia game online, social deduction game, online party game, browser game, free online game, multiplayer mafia, play with friends, online games',
     },
 
     roles: {
@@ -456,6 +494,25 @@ export const translations = {
       votingPhase: '🗳️ Vote',
       votingPhaseDesc: 'À la fin du jour, chaque joueur vote pour la personne qu\'il soupçonne. Le joueur ayant le plus de votes est éliminé et son rôle est révélé.',
       conclusion: 'Cette version de la Mafia a été conçue comme un jeu de société en ligne simple et rapide auquel vous pouvez jouer avec des amis sans installer d\'application. C\'est aussi un jeu pratique sans connexion, vous pouvez donc créer immédiatement une salle, inviter des amis et commencer à jouer en quelques secondes. Si vous cherchez un divertissement simple, rapide et passionnant pour un groupe d\'amis, la Mafia en ligne est un excellent choix pour s\'amuser ensemble et pour une soirée remplie de bluff, de stratégie et de rires.',
+
+      faqTitle: 'FAQ – questions fréquentes sur Mafia en ligne',
+      faqIntro: 'Vous trouverez ci-dessous les réponses aux questions les plus fréquentes sur notre jeu de société Mafia en ligne.',
+      faq1Q: 'Mafia en ligne est-elle un jeu gratuit ?',
+      faq1A: 'Oui. Mafia en ligne est un jeu de société en ligne entièrement gratuit dans le navigateur – un jeu mafia en ligne gratuit, sans connexion, sans installation et sans limite de parties.',
+      faq2Q: 'Combien de joueurs peuvent participer à ce jeu de société en ligne pour une soirée ?',
+      faq2A: 'Mafia en ligne est idéale comme jeu de soirée en ligne pour un groupe d\'amis. Une salle peut accueillir plusieurs à une douzaine de joueurs (nous recommandons au moins 4 joueurs).',
+      faq3Q: 'Puis-je jouer à ce jeu Mafia en ligne avec des amis d\'autres pays ?',
+      faq3A: 'Oui. Le jeu est multilingue – l\'interface est disponible en polonais, anglais, français et allemand, ce qui fait de Mafia en ligne un excellent jeu de société pour des groupes internationaux.',
+      faq4Q: 'Sur quels appareils puis-je jouer à ce jeu en ligne ?',
+      faq4A: 'Mafia en ligne fonctionne dans le navigateur sur ordinateur, portable et mobile. Il suffit d\'un lien vers la salle – c\'est un jeu en ligne simple sans téléchargement ni compte.',
+    },
+
+    seo: {
+      title: 'Mafia en ligne – jeu de société multijoueur | Jeu de déduction sociale',
+      description:
+        'Mafia en ligne est un jeu de déduction sociale gratuit dans le navigateur. Créez une salle, invitez vos amis et jouez à Mafia en ligne en français – sans inscription ni installation.',
+      keywords:
+        'mafia en ligne, jeu mafia en ligne, jeu de société en ligne, jeu de soirée, jeu de déduction sociale, jeu multijoueur gratuit, jeu navigateur, jouer avec des amis',
     },
 
     roles: {
@@ -668,6 +725,25 @@ export const translations = {
       votingPhase: '🗳️ Abstimmung',
       votingPhaseDesc: 'Am Ende des Tages stimmt jeder Spieler über die Person ab, die er verdächtigt. Der Spieler mit den meisten Stimmen wird eliminiert und seine Rolle wird enthüllt.',
       conclusion: 'Diese Version von Mafia wurde als einfaches und schnelles Online-Partyspiel konzipiert, das du mit Freunden spielen kannst, ohne eine Anwendung zu installieren. Es ist auch ein bequemes Spiel ohne Anmeldung, sodass du sofort einen Raum erstellen, Freunde einladen und in wenigen Sekunden spielen kannst. Wenn du nach einfacher, schneller und aufregender Unterhaltung für eine Freundesgruppe suchst, ist Mafia online eine großartige Wahl zum gemeinsamen Spaß und einen Abend voller Bluff, Strategie und Lachen.',
+
+      faqTitle: 'FAQ – häufige Fragen zu Mafia online',
+      faqIntro: 'Hier findest du Antworten auf die häufigsten Fragen zu unserem Mafia online Partyspiel.',
+      faq1Q: 'Ist Mafia online kostenlos spielbar?',
+      faq1A: 'Ja. Mafia online ist ein komplett kostenloses Partyspiel im Browser – ein kostenloses Mafia-Online-Spiel ohne Anmeldung, ohne Installation und ohne Begrenzung der Runden.',
+      faq2Q: 'Wie viele Spieler können bei diesem Online-Partyspiel für Freunde mitmachen?',
+      faq2A: 'Mafia online eignet sich am besten als Gesellschaftsspiel und Online-Partyspiel für eine Freundesgruppe. In einem Raum können mehrere bis ein Dutzend Spieler mitspielen (empfohlen sind mindestens 4 Spieler).',
+      faq3Q: 'Kann ich dieses Mafia-Online-Spiel mit Freunden aus anderen Ländern spielen?',
+      faq3A: 'Ja. Das Spiel ist mehrsprachig – die Oberfläche ist auf Polnisch, Englisch, Französisch und Deutsch verfügbar, sodass sich Mafia online perfekt als Partyspiel für internationale Gruppen eignet.',
+      faq4Q: 'Auf welchen Geräten laufen diese Online-Spiele?',
+      faq4A: 'Mafia online läuft im Browser auf PC, Laptop und Smartphone. Ein Raumlink genügt – es ist ein einfaches Online-Spiel ohne Download und ohne Konto.',
+    },
+
+    seo: {
+      title: 'Mafia online – kostenloses Partyspiel | Social-Deduction-Browserspiel',
+      description:
+        'Mafia online ist ein kostenloses Social-Deduction-Partyspiel im Browser. Erstelle einen Raum, lade Freunde ein und spiele Mafia online auf Deutsch – ganz ohne Download und Registrierung.',
+      keywords:
+        'mafia online, mafia spiel online, partyspiel online, social deduction spiel, browser spiel, kostenlose online spiele, mit freunden online spielen, multiplayer mafia',
     },
 
     roles: {
