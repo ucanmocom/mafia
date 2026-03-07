@@ -77,7 +77,7 @@ export const translations = {
     lobby: {
       roomCode: 'Kod pokoju',
       copyHint: 'Kliknij by skopiować',
-      shareCopy: 'Podaj kod znajomym · kliknij by skopiować',
+      shareCopy: 'Podaj kod znajomym · lub kliknij by skopiować',
       players: 'Gracze',
       minimum: 'Minimum',
       status: 'Status',
@@ -92,7 +92,7 @@ export const translations = {
       tooManySpecial: 'Za dużo specjalnych ról',
       settings: 'Ustawienia',
       startGame: 'Rozpocznij grę',
-      waitHost: 'Czekaj na hosta…',
+      waitHost: 'Oczekiwanie na start',
       leaveRoom: 'Opuść pokój',
     },
 

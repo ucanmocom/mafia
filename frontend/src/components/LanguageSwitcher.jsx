@@ -23,9 +23,9 @@ export default function LanguageSwitcher() {
     <div
       ref={ref}
       style={{
-        position: 'fixed',
+        position: 'absolute',
         top: 24,
-        left: 24,
+        right: 24,
         zIndex: 1100,
         userSelect: 'none',
       }}
@@ -65,7 +65,7 @@ export default function LanguageSwitcher() {
         <div style={{
           position: 'absolute',
           top: 'calc(100% + 4px)',
-          left: 0,
+          right: 0,
           background: 'var(--surface)',
           border: '1px solid var(--border)',
           borderRadius: '8px',

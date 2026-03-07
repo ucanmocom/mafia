@@ -73,7 +73,8 @@ export default function LobbyScreen({ state, actions }) {
   const { t } = useLanguage()
   const { roomCode, players, settings, isHost, hostId, playerId } = state
   const [localSettings, setLocalSettings] = useState(settings)
-  const [showCopiedToast, setShowCopiedToast] = useState(false)
+  const [isLinkCopied, setIsLinkCopied] = useState(false)
+  const [showNeedPlayersModal, setShowNeedPlayersModal] = useState(false)
 
   const alivePlayers = players.filter(p => p.isConnected !== false)
   const totalSpecial =
@@ -83,6 +84,7 @@ export default function LobbyScreen({ state, actions }) {
   const mafiaRuleOk = localSettings.mafiaCount <= 1 || alivePlayers.length >= 6
   const loversOk = (localSettings.loversCount ?? 0) <= 1
   const canStart = alivePlayers.length >= 4 && totalSpecial < alivePlayers.length && mafiaRuleOk && loversOk
+  const missingPlayers = Math.max(0, 4 - alivePlayers.length)
 
   const handleSettingsChange = (key, val) => {
     const updated = { ...localSettings, [key]: Number(val) }
@@ -91,13 +93,25 @@ export default function LobbyScreen({ state, actions }) {
   }
 
   const copyCode = () => {
-    navigator.clipboard.writeText(roomCode).catch(() => {})
+    const inviteUrl = `${window.location.origin}/room/${roomCode}`
+    navigator.clipboard.writeText(inviteUrl).catch(() => {})
+    setIsLinkCopied(true)
+    setTimeout(() => setIsLinkCopied(false), 2000)
   }
 
   const copyInviteLink = () => {
-    const baseUrl = window.location.origin
-    const inviteUrl = `${baseUrl}/?roomCode=${roomCode}`
+    const inviteUrl = `${window.location.origin}/room/${roomCode}`
     navigator.clipboard.writeText(inviteUrl).catch(() => {})
+    setIsLinkCopied(true)
+    setTimeout(() => setIsLinkCopied(false), 2000)
+  }
+
+  const handleStartClick = () => {
+    if (missingPlayers > 0) {
+      setShowNeedPlayersModal(true)
+      return
+    }
+    actions.startGame()
   }
 
   return (
@@ -105,69 +119,84 @@ export default function LobbyScreen({ state, actions }) {
       <div style={{ width: '100%', maxWidth: '420px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
         {/* Room code hero */}
-        <div>
-          <p className="label-cap" style={{ marginBottom: '6px' }}>{t.lobby.roomCode}</p>
-          <div
-            className="room-code"
-            onClick={copyCode}
-            title={t.lobby.copyHint}
-            style={{ cursor: 'pointer', textAlign: 'left' }}
-          >
+        <div className="room-code-hero">
+          <p className="label-cap room-code-hero-label">{t.lobby.roomCode}</p>
+          <div className="room-code" title={t.lobby.copyHint}>
             {roomCode}
           </div>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-            {t.lobby.shareCopy}
-          </p>
+          <button
+            className="copy-room-code-btn"
+            onClick={copyCode}
+            title={t.lobby.copyHint}
+          >
+            {isLinkCopied ? 'Skopiowano do schowka...' : 'Zaproś - skopiuj link'}
+          </button>
+          <p className="room-code-hero-hint">{t.lobby.shareCopy}</p>
         </div>
 
-        {/* Invite link button */}
-        <button
-          onClick={() => {
-            const baseUrl = window.location.origin
-            const inviteUrl = `${baseUrl}/?roomCode=${roomCode}`
-            const fullInviteText = `Zagraj ze mną w Mafia Online\n${inviteUrl}\n(${roomCode})`
-            navigator.clipboard.writeText(fullInviteText).catch(() => {})
-            setShowCopiedToast(true)
-            setTimeout(() => setShowCopiedToast(false), 5000)
-          }}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            fontSize: '0.85rem',
-            cursor: 'pointer',
-            padding: '8px 0',
-            margin: '0',
-            textAlign: 'left',
-            transition: 'color 0.2s ease',
-          }}
-          onMouseEnter={(e) => e.target.style.color = 'var(--brand)'}
-          onMouseLeave={(e) => e.target.style.color = 'var(--text-muted)'}
-          title="Skopiuj link zaproszenia"
-        >
-          🔗 Skopiuj link
-        </button>
-
-        {/* Toast notification */}
-        {showCopiedToast && (
-          <div
-            style={{
-              position: 'fixed',
-              bottom: '24px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              background: 'var(--brand)',
-              color: 'white',
-              padding: '12px 20px',
-              borderRadius: 'var(--radius)',
-              fontSize: '0.85rem',
-              zIndex: 1000,
-              boxShadow: 'var(--shadow-lg)',
-              animation: 'fadeIn 0.2s ease',
-            }}
-          >
-            ✓ Skopiowano do schowka
-          </div>
+        {showNeedPlayersModal && (
+          <>
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.72)',
+                zIndex: 1100,
+              }}
+              onClick={() => setShowNeedPlayersModal(false)}
+            />
+            <div
+              style={{
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'min(92vw, 360px)',
+                background: 'var(--surface)',
+                border: '1px solid var(--border2)',
+                borderLeft: '3px solid var(--red-bright)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '18px',
+                zIndex: 1101,
+                boxShadow: 'var(--shadow-lg)',
+              }}
+            >
+              <p style={{
+                margin: '0 0 8px',
+                fontWeight: 800,
+                color: '#fff',
+                textAlign: 'center',
+                letterSpacing: '0.02em',
+              }}>
+                Potrzeba co najmniej 4 graczy
+              </p>
+              <p style={{ margin: '0 0 14px', fontSize: '0.86rem', color: 'var(--text-dim)', lineHeight: 1.45, textAlign: 'center' }}>
+                Brakuje jeszcze {missingPlayers} graczy. Zaproś znajomych linkiem do pokoju.
+              </p>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  className="btn btn-primary btn-sm"
+                  style={{ flex: 1 }}
+                  onClick={() => {
+                    copyInviteLink()
+                    setShowNeedPlayersModal(false)
+                  }}
+                >
+                  Zaproś znajomych
+                </button>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  style={{ flex: 1 }}
+                  onClick={() => setShowNeedPlayersModal(false)}
+                >
+                  Zamknij
+                </button>
+              </div>
+            </div>
+          </>
         )}
 
         {/* Stats strip */}
@@ -218,10 +247,10 @@ export default function LobbyScreen({ state, actions }) {
           </div>
         </div>
 
-        {/* Settings (host only) */}
+        {/* Role settings (host only) */}
         {isHost && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <p className="label-cap" style={{ marginBottom: '8px' }}>{t.lobby.settings}</p>
+            <p className="label-cap" style={{ marginBottom: '8px' }}>Role</p>
 
             <div className="card-sm">
               <SettingRow
@@ -232,11 +261,6 @@ export default function LobbyScreen({ state, actions }) {
                 hint={t.roleHints.mafia}
                 onChange={v => handleSettingsChange('mafiaCount', v)}
               />
-              {localSettings.mafiaCount > 1 && alivePlayers.length < 6 && (
-                <p style={{ color: 'var(--red-bright)', fontSize: '0.75rem', padding: '0 16px 10px' }}>
-                  {t.lobby.tooManyMafia.replace('{n}', alivePlayers.length)}
-                </p>
-              )}
               <SettingRow
                 label={t.roles.detective}
                 value={localSettings.detectiveCount}
@@ -263,10 +287,9 @@ export default function LobbyScreen({ state, actions }) {
               />
             </div>
 
-            <div className="card-sm" style={{ marginTop: '8px' }}>
-              <div style={{ padding: '10px 16px 2px' }}>
-                <p className="label-cap">{t.lobby.timers}</p>
-              </div>
+            <p className="label-cap" style={{ margin: '8px 0 8px' }}>{t.lobby.timers}</p>
+
+            <div className="card-sm">
               <SettingRow
                 label={t.lobby.discussion}
                 value={Math.round((localSettings.dayDuration || 120000) / 1000)}
@@ -284,36 +307,84 @@ export default function LobbyScreen({ state, actions }) {
                 onChange={v => handleSettingsChange('nightDuration', v * 1000)}
               />
             </div>
-
-            {alivePlayers.length < 4 && (
-              <p style={{ color: 'var(--yellow)', fontSize: '0.8rem' }}>
-                {t.lobby.needPlayers}
-              </p>
-            )}
-            {totalSpecial >= alivePlayers.length && (
-              <p style={{ color: 'var(--yellow)', fontSize: '0.8rem' }}>
-                {t.lobby.tooManySpecial}
-              </p>
-            )}
           </div>
         )}
 
         {/* Actions */}
         {isHost ? (
-          <button
-            className="btn btn-primary"
-            disabled={!canStart}
-            onClick={actions.startGame}
-          >
-            {t.lobby.startGame}
-          </button>
+          <>
+            {missingPlayers > 0 && (
+              <p style={{
+                margin: '4px 0 6px',
+                textAlign: 'center',
+                color: 'rgba(255, 214, 214, 0.5)',
+                fontWeight: 600,
+                fontSize: '0.78rem',
+                letterSpacing: '0.015em',
+                animation: 'pulse 3.2s ease-in-out infinite',
+              }}>
+                Potrzeba co najmniej 4 graczy
+              </p>
+            )}
+            <button
+              className="btn"
+              style={{
+                fontSize: '1.03rem',
+                padding: '16px 20px',
+                minHeight: '56px',
+                background: 'linear-gradient(135deg, #8B0000 0%, #B22222 52%, #DC143C 100%)',
+                border: '2px solid rgba(139, 0, 0, 0.95)',
+                color: '#ffffff',
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                borderRadius: '12px',
+                boxShadow: '0 8px 28px rgba(139, 0, 0, 0.55), 0 0 16px rgba(139, 0, 0, 0.62)',
+                textShadow: '0 1px 6px rgba(0, 0, 0, 0.7)',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onClick={handleStartClick}
+            >
+              {t.lobby.startGame}
+            </button>
+          </>
         ) : (
           <div style={{ textAlign: 'center', padding: '12px 0' }}>
-            <p className="label-cap">{t.lobby.waitHost}</p>
+            <style>{`
+              @keyframes bloodWaitPulse {
+                0%, 100% {
+                  color: #e87373;
+                  text-shadow: 0 0 6px rgba(220, 20, 60, 0.45), 0 0 14px rgba(139, 0, 0, 0.4);
+                  transform: scale(1);
+                }
+                50% {
+                  color: #ef5757;
+                  text-shadow: 0 0 10px rgba(255, 0, 0, 0.65), 0 0 22px rgba(139, 0, 0, 0.65);
+                  transform: scale(1.015);
+                }
+              }
+            `}</style>
+            <p
+              style={{
+                margin: 0,
+                fontSize: '1.15rem',
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                animation: 'bloodWaitPulse 2.2s ease-in-out infinite',
+              }}
+            >
+              {t.lobby.waitHost}
+            </p>
           </div>
         )}
 
-        <button className="btn btn-ghost" onClick={actions.leaveRoom}>
+        <button
+          className="btn btn-danger-dark"
+          style={{ padding: '16px 20px', minHeight: '54px' }}
+          onClick={actions.leaveRoom}
+        >
           {t.lobby.leaveRoom}
         </button>
 
@@ -326,23 +397,23 @@ export default function LobbyScreen({ state, actions }) {
 function SettingRow({ label, value, min, max, step = 1, hint, onChange }) {
   return (
     <div className="setting-row">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
         <span className="setting-row-label">{label}</span>
         {hint && <RoleHintButton hint={hint} />}
       </div>
-      <button
-        className="btn btn-ghost btn-sm"
-        style={{ padding: '6px 10px', minWidth: '32px' }}
-        onClick={() => onChange(Math.max(min, value - step))}
-        disabled={value <= min}
-      >−</button>
-      <span className="setting-row-val">{value}</span>
-      <button
-        className="btn btn-ghost btn-sm"
-        style={{ padding: '6px 10px', minWidth: '32px' }}
-        onClick={() => onChange(Math.min(max, value + step))}
-        disabled={value >= max}
-      >+</button>
+      <div className="setting-row-controls">
+        <button
+          className="setting-step-btn"
+          onClick={() => onChange(Math.max(min, value - step))}
+          disabled={value <= min}
+        >−</button>
+        <span className="setting-row-val">{value}</span>
+        <button
+          className="setting-step-btn"
+          onClick={() => onChange(Math.min(max, value + step))}
+          disabled={value >= max}
+        >+</button>
+      </div>
     </div>
   )
 }

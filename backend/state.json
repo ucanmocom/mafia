@@ -1,14 +1,14 @@
 {
-  "Z6MZBG": {
-    "code": "Z6MZBG",
-    "hostId": "120f2e58-710e-44b7-877b-498954549c36",
+  "7SE9W3": {
+    "code": "7SE9W3",
+    "hostId": "0d4f922d-3b32-447b-bd1d-fb73147428fe",
     "players": {
-      "120f2e58-710e-44b7-877b-498954549c36": {
-        "id": "120f2e58-710e-44b7-877b-498954549c36",
-        "nick": "heh",
+      "0d4f922d-3b32-447b-bd1d-fb73147428fe": {
+        "id": "0d4f922d-3b32-447b-bd1d-fb73147428fe",
+        "nick": "ada",
         "role": null,
         "isAlive": true,
-        "isConnected": true,
+        "isConnected": false,
         "isHost": true
       }
     },
@@ -31,7 +31,170 @@
     "nightResult": null,
     "voteResult": null,
     "winner": null,
-    "createdAt": 1772817550943,
+    "createdAt": 1772824966905,
+    "hostMigrateTimer": null,
+    "skipDayVotes": {},
+    "loverIds": null
+  },
+  "EVRQAF": {
+    "code": "EVRQAF",
+    "hostId": "715d563a-12e6-42d6-b561-dea13ec79cfc",
+    "players": {
+      "715d563a-12e6-42d6-b561-dea13ec79cfc": {
+        "id": "715d563a-12e6-42d6-b561-dea13ec79cfc",
+        "nick": "ADA",
+        "role": null,
+        "isAlive": true,
+        "isConnected": false,
+        "isHost": true
+      }
+    },
+    "settings": {
+      "mafiaCount": 1,
+      "doctorCount": 1,
+      "detectiveCount": 1,
+      "loversCount": 0,
+      "dayDuration": 120000,
+      "nightDuration": 60000
+    },
+    "phase": "lobby",
+    "round": 0,
+    "nightActions": {
+      "detectiveTargets": {},
+      "doctorTarget": null,
+      "mafiaVotes": {}
+    },
+    "votes": {},
+    "nightResult": null,
+    "voteResult": null,
+    "winner": null,
+    "createdAt": 1772825276729,
+    "hostMigrateTimer": null,
+    "skipDayVotes": {},
+    "loverIds": null
+  },
+  "REQRFQ": {
+    "code": "REQRFQ",
+    "hostId": "a871ea61-7347-4da2-932d-13d42f3ce197",
+    "players": {
+      "a871ea61-7347-4da2-932d-13d42f3ce197": {
+        "id": "a871ea61-7347-4da2-932d-13d42f3ce197",
+        "nick": "ada",
+        "role": null,
+        "isAlive": true,
+        "isConnected": false,
+        "isHost": true
+      }
+    },
+    "settings": {
+      "mafiaCount": 1,
+      "doctorCount": 1,
+      "detectiveCount": 1,
+      "loversCount": 0,
+      "dayDuration": 120000,
+      "nightDuration": 60000
+    },
+    "phase": "lobby",
+    "round": 0,
+    "nightActions": {
+      "detectiveTargets": {},
+      "doctorTarget": null,
+      "mafiaVotes": {}
+    },
+    "votes": {},
+    "nightResult": null,
+    "voteResult": null,
+    "winner": null,
+    "createdAt": 1772825594675,
+    "hostMigrateTimer": null,
+    "skipDayVotes": {},
+    "loverIds": null
+  },
+  "YDPMUL": {
+    "code": "YDPMUL",
+    "hostId": "efa46065-ca06-45d8-968f-f68cc11ed579",
+    "players": {
+      "efa46065-ca06-45d8-968f-f68cc11ed579": {
+        "id": "efa46065-ca06-45d8-968f-f68cc11ed579",
+        "nick": "kubek",
+        "role": "villager",
+        "isAlive": false,
+        "isConnected": false,
+        "isHost": true,
+        "loverId": null
+      },
+      "f27ba99d-8aa1-4687-8fa2-a18637701f2e": {
+        "id": "f27ba99d-8aa1-4687-8fa2-a18637701f2e",
+        "nick": "pilot",
+        "role": "villager",
+        "isAlive": false,
+        "isConnected": false,
+        "isHost": false,
+        "loverId": null
+      },
+      "ae5a903e-bc90-4185-a2bb-caca372de695": {
+        "id": "ae5a903e-bc90-4185-a2bb-caca372de695",
+        "nick": "telefon",
+        "role": "mafia",
+        "isAlive": true,
+        "isConnected": false,
+        "isHost": false,
+        "loverId": null
+      },
+      "95e17ad9-99a6-4fad-af22-0a59a2c0db1b": {
+        "id": "95e17ad9-99a6-4fad-af22-0a59a2c0db1b",
+        "nick": "stół",
+        "role": "detective",
+        "isAlive": false,
+        "isConnected": false,
+        "isHost": false,
+        "loverId": null
+      },
+      "d5769a95-a2c1-4d42-a11a-0e38e3ff9917": {
+        "id": "d5769a95-a2c1-4d42-a11a-0e38e3ff9917",
+        "nick": "dolacz",
+        "role": "doctor",
+        "isAlive": true,
+        "isConnected": false,
+        "isHost": false,
+        "loverId": null
+      }
+    },
+    "settings": {
+      "mafiaCount": 1,
+      "doctorCount": 1,
+      "detectiveCount": 1,
+      "loversCount": 0,
+      "dayDuration": 110000,
+      "nightDuration": 50000
+    },
+    "phase": "game_over",
+    "round": 5,
+    "nightActions": {
+      "detectiveTargets": {
+        "95e17ad9-99a6-4fad-af22-0a59a2c0db1b": "d5769a95-a2c1-4d42-a11a-0e38e3ff9917"
+      },
+      "doctorTarget": "ae5a903e-bc90-4185-a2bb-caca372de695",
+      "mafiaVotes": {
+        "ae5a903e-bc90-4185-a2bb-caca372de695": "95e17ad9-99a6-4fad-af22-0a59a2c0db1b"
+      }
+    },
+    "votes": {},
+    "nightResult": {
+      "killedId": "95e17ad9-99a6-4fad-af22-0a59a2c0db1b"
+    },
+    "voteResult": {
+      "eliminatedId": null,
+      "eliminatedNick": null,
+      "role": null,
+      "tie": false,
+      "tally": {},
+      "loverEliminatedId": null,
+      "loverEliminatedNick": null,
+      "loverEliminatedRole": null
+    },
+    "winner": "mafia",
+    "createdAt": 1772826004993,
     "hostMigrateTimer": null,
     "skipDayVotes": {},
     "loverIds": null
