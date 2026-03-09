@@ -526,7 +526,7 @@ export const translations = {
     seo: {
       title: 'Mafia en ligne – jeu de société multijoueur | Jeu de déduction sociale',
       description:
-        'Mafia en ligne est un jeu de déduction sociale gratuit dans le navigateur. Créez une salle, invitez vos amis et jouez à Mafia en ligne en français – sans inscription ni installation.',
+        'Mafia en ligne – jeu de société gratuit en navigateur. Créez une salle, invitez vos amis et jouez en français – sans inscription ni installation.',
       keywords:
         'mafia en ligne, jeu mafia en ligne, jeu de société en ligne, jeu de soirée, jeu de déduction sociale, jeu multijoueur gratuit, jeu navigateur, jouer avec des amis',
     },
@@ -765,7 +765,7 @@ export const translations = {
     seo: {
       title: 'Mafia online – kostenloses Partyspiel | Social-Deduction-Browserspiel',
       description:
-        'Mafia online ist ein kostenloses Social-Deduction-Partyspiel im Browser. Erstelle einen Raum, lade Freunde ein und spiele Mafia online auf Deutsch – ganz ohne Download und Registrierung.',
+        'Mafia online – kostenloses Partyspiel im Browser. Erstelle einen Raum, lade Freunde ein und spiele Mafia online auf Deutsch – ohne Anmeldung.',
       keywords:
         'mafia online, mafia spiel online, partyspiel online, social deduction spiel, browser spiel, kostenlose online spiele, mit freunden online spielen, multiplayer mafia',
     },
