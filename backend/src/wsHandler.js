@@ -564,18 +564,24 @@ function handleConnection(ws, gameManager) {
 
         const room = result.room;
 
+        // Confirm to the voter that their vote was accepted by the server.
+        send(ws, EVENTS.VOTE_ACK, { targetId: data.targetId });
+
         // Broadcast live vote counts (without revealing who voted for whom)
         const tally = {};
         for (const targetId of Object.values(room.votes)) {
           tally[targetId] = (tally[targetId] || 0) + 1;
         }
-        const alive = Object.values(room.players).filter((p) => p.isAlive);
-        const votedCount = Object.keys(room.votes).length;
-        console.log(`[vote] Player ${room.players[currentPlayerId]?.nick} voted for ${room.players[data.targetId]?.nick || 'skip'}. Votes: ${votedCount}/${alive.length}`);
+        const eligibleVoters = Object.values(room.players).filter((p) => p.isAlive && p.isConnected !== false);
+        const votedCount = Object.keys(room.votes).filter((voterId) => {
+          const voter = room.players[voterId];
+          return voter && voter.isAlive && voter.isConnected !== false;
+        }).length;
+        console.log(`[vote] Player ${room.players[currentPlayerId]?.nick} voted for ${room.players[data.targetId]?.nick || 'skip'}. Votes: ${votedCount}/${eligibleVoters.length}`);
         broadcast(room, EVENTS.VOTE_UPDATE, { tally, votedCount });
 
-        // If everyone alive voted → resolve immediately
-        if (votedCount >= alive.length) {
+        // If all alive and connected players voted → resolve immediately
+        if (votedCount >= eligibleVoters.length) {
           console.log(`[vote] All players voted! Resolving voting.`);
           doResolveVoting(room, gameManager);
         }

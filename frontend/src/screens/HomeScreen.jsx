@@ -1,89 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useLanguage } from '../contexts/LanguageContext'
-import { useNavigate } from 'react-router-dom'
-import { Moon, MessageCircle, Vote, Users, Clock, Settings } from 'lucide-react'
-import RoomSettings from '../components/RoomSettings'
+import { Moon, MessageCircle, Vote } from 'lucide-react'
 
-export default function HomeScreen({ state, actions, initialJoinCode = '' }) {
-  const { t, lang } = useLanguage()
-  const navigate = useNavigate()
+export default function HomeScreen({ state, actions }) {
+  const { t } = useLanguage()
   const [nick, setNick]         = useState('')
   const [roomCode, setRoomCode] = useState('')
-  const [mode, setMode]         = useState('home') // 'home' | 'create-name' | 'create-settings' | 'join'
-  const [waitingForRoom, setWaitingForRoom] = useState(false)
-  const [inviteStatus, setInviteStatus] = useState('idle') // 'idle' | 'checking' | 'valid' | 'missing'
-  const [checkingJoinCode, setCheckingJoinCode] = useState(false)
-  const [joinCodeError, setJoinCodeError] = useState('')
-
-  const goToHomeRoute = () => {
-    actions.clearError?.()
-    setNick('')
-    setRoomCode('')
-    setInviteStatus('idle')
-    setMode('home')
-    navigate(`/${lang || 'pl'}`, { replace: true })
-  }
-  
-  // Game settings for room creation
-  const [gameSettings, setGameSettings] = useState({
-    mafiaCount: 1,
-    doctorCount: 1,
-    detectiveCount: 1,
-    loversCount: 0,
-    dayDuration: 120000, // miliseconds to match backend
-    nightDuration: 60000, // miliseconds to match backend
-  })
-
-  // Auto-switch to settings when room code is received
-  useEffect(() => {
-    if (waitingForRoom && state.roomCode) {
-      setWaitingForRoom(false)
-      setMode('create-settings')
-    }
-  }, [state.roomCode, waitingForRoom])
-
-  // Deep-link flow: /room/XXXXXX -> open join mode with prefilled room code.
-  useEffect(() => {
-    const normalized = (initialJoinCode || '').trim().toUpperCase()
-    if (!normalized) return
-    setMode('join')
-    setRoomCode(normalized)
-  }, [initialJoinCode])
-
-  // Validate deep-link room early so random / stale links show dedicated fallback immediately.
-  useEffect(() => {
-    const normalized = (initialJoinCode || '').trim().toUpperCase()
-    if (!normalized) {
-      setInviteStatus('idle')
-      return
-    }
-
-    const controller = new AbortController()
-    setInviteStatus('checking')
-
-    fetch(`/join/${encodeURIComponent(normalized)}`, { signal: controller.signal })
-      .then((res) => {
-        if (res.status === 404) {
-          setInviteStatus('missing')
-          return
-        }
-        // If backend responds (room exists or non-404 edge), allow user to continue.
-        setInviteStatus('valid')
-      })
-      .catch(() => {
-        // Network hiccups should not lock joining flow.
-        setInviteStatus('valid')
-      })
-
-    return () => controller.abort()
-  }, [initialJoinCode])
+  const [mode, setMode]         = useState('home') // 'home' | 'create' | 'join'
 
   const handleCreate = (e) => {
     e.preventDefault()
     if (!nick.trim()) return
     actions.setNick(nick.trim())
     actions.createRoom(nick.trim())
-    setWaitingForRoom(true)
   }
 
   const handleJoin = (e) => {
@@ -93,324 +22,24 @@ export default function HomeScreen({ state, actions, initialJoinCode = '' }) {
     actions.joinRoom(roomCode.trim().toUpperCase(), nick.trim())
   }
 
-  const handleJoinCodeStep = async (e) => {
-    e.preventDefault()
-    const normalized = roomCode.trim().toUpperCase()
-    if (!normalized) return
-
-    setJoinCodeError('')
-    setCheckingJoinCode(true)
-
-    try {
-      const response = await fetch(`/join/${encodeURIComponent(normalized)}`)
-
-      if (response.status === 404) {
-        setJoinCodeError('Nie ma takiego pokoju.')
-        return
-      }
-
-      if (!response.ok) {
-        setJoinCodeError('Nie udało się sprawdzić pokoju. Spróbuj ponownie.')
-        return
-      }
-
-      navigate(`/${lang || 'pl'}/room/${normalized}`)
-    } catch {
-      setJoinCodeError('Błąd połączenia. Spróbuj ponownie.')
-    } finally {
-      setCheckingJoinCode(false)
-    }
-  }
-
-  if (mode === 'create-name') {
+  if (mode === 'create') {
     return (
-      <div className="screen" style={{
-        position: 'relative',
-        background: 'linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.95) 100%)',
-        minHeight: '100vh',
-        padding: '20px'
-      }}>
-        <button
-          className="btn btn-ghost btn-sm"
-          style={{
-            position: 'absolute',
-            top: 24,
-            left: 24,
-            width: 'auto',
-            height: '40px',
-            minHeight: '40px',
-            padding: '0 12px',
-            borderRadius: '8px',
-            fontSize: '0.85rem',
-            fontWeight: 700,
-            letterSpacing: '0.04em',
-            color: '#ffe8e8',
-            border: 'none',
-            background: 'rgba(8, 6, 6, 0.9)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.35)',
-            lineHeight: 1,
-          }}
-          onClick={() => setMode('home')}
-          title={t.back}
-          aria-label={t.back}
-        >
-          ← Wróć
-        </button>
-
-        <div style={{ 
-          width: '100%', 
-          maxWidth: '460px', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: '16px' 
-        }}>
-
-          <div style={{ textAlign: 'center', marginTop: '8px' }}>
-            <h1 style={{ fontSize: '1.85rem', fontWeight: 800, marginBottom: '8px', color: '#fff' }}>
-              Wprowadź swój nick
-            </h1>
-          </div>
-
-          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '4px' }}>
-            <input
-              type="text"
-              placeholder={t.home.nickPlaceholder}
-              value={nick}
-              maxLength={20}
-              onChange={e => setNick(e.target.value)}
-              autoFocus
-              style={{
-                fontSize: '1.25rem',
-                padding: '18px 20px',
-                borderRadius: '12px',
-                background: 'rgba(0, 0, 0, 0.45)',
-                border: '1.5px solid rgba(255,255,255,0.14)',
-                color: '#fff',
-                textAlign: 'center',
-                fontWeight: 600,
-              }}
-            />
-
-            <button
-              type="submit"
-              disabled={!nick.trim() || waitingForRoom}
-              className="btn"
-              style={{
-                fontSize: '1.03rem',
-                padding: '16px 20px',
-                minHeight: '56px',
-                background: (!nick.trim() || waitingForRoom)
-                  ? 'rgba(139, 0, 0, 0.26)'
-                  : 'linear-gradient(135deg, #8B0000 0%, #B22222 52%, #DC143C 100%)',
-                border: '2px solid rgba(139, 0, 0, 0.95)',
-                color: '#ffffff',
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                borderRadius: '12px',
-                boxShadow: (!nick.trim() || waitingForRoom)
-                  ? 'none'
-                  : '0 8px 28px rgba(139, 0, 0, 0.55), 0 0 16px rgba(139, 0, 0, 0.62)',
-                textShadow: '0 1px 6px rgba(0, 0, 0, 0.7)',
-                cursor: (!nick.trim() || waitingForRoom) ? 'not-allowed' : 'pointer',
-                opacity: waitingForRoom ? 0.78 : 1,
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {waitingForRoom ? 'Tworzenie...' : 'Dalej'}
-            </button>
-          </form>
-        </div>
-      </div>
-    )
-  }
-
-  if (mode === 'create-settings') {
-    return (
-      <div className="screen-top" style={{ background: 'rgba(0,0,0,0.97)', paddingTop: '24px' }}>
-        <div style={{ width: '100%', maxWidth: '420px', display: 'flex', flexDirection: 'column', gap: '14px', alignItems: 'flex-start' }}>
-          <button className="btn btn-ghost btn-sm" style={{ width: 'auto' }} onClick={() => setMode('create-name')}>
-            ← {t.back}
-          </button>
-          <RoomSettings
-            roomCode={state.roomCode}
-            players={state.players}
-            nick={nick}
-            playerId={state.playerId}
-            settings={gameSettings}
-            onChange={setGameSettings}
-            onSave={() => actions.updateSettings(gameSettings)}
-          />
-        </div>
-      </div>
-    )
-  }
-
-  if (mode === 'join') {
-    const isFromRoomLink = !!(initialJoinCode || '').trim()
-    const roomMissingError = isFromRoomLink && (
-      inviteStatus === 'missing' ||
-      /pok[oó]j nie istnieje/i.test(state?.lastError || '')
-    )
-
-    if (isFromRoomLink) {
-      if (inviteStatus === 'checking') {
-        return (
-          <div className="screen" style={{
-            position: 'relative',
-            background: 'linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.95) 100%)',
-            minHeight: '100vh',
-            padding: '20px'
-          }}>
-            <div style={{
-              width: '100%',
-              maxWidth: '460px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              textAlign: 'center',
-              alignItems: 'center',
-            }}>
-              <h1 style={{ fontSize: '1.6rem', fontWeight: 800, marginBottom: '4px', color: '#fff' }}>
-                Sprawdzam pokój...
-              </h1>
-              <p style={{ color: 'rgba(255,255,255,0.72)', fontSize: '0.92rem' }}>
-                Chwila cierpliwości.
-              </p>
-            </div>
-          </div>
-        )
-      }
-
-      if (roomMissingError) {
-        return (
-          <div className="screen" style={{
-            position: 'relative',
-            background: 'linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.95) 100%)',
-            minHeight: '100vh',
-            padding: '20px'
-          }}>
-            <style>{`
-              @keyframes oopsRedPulse {
-                0%, 100% {
-                  color: #ff6b6b;
-                  text-shadow: 0 0 10px rgba(220, 20, 60, 0.65), 0 0 24px rgba(139, 0, 0, 0.7);
-                  transform: scale(1);
-                }
-                50% {
-                  color: #ff2e2e;
-                  text-shadow: 0 0 16px rgba(255, 0, 0, 0.9), 0 0 38px rgba(139, 0, 0, 0.95);
-                  transform: scale(1.04);
-                }
-              }
-            `}</style>
-            <div style={{
-              width: '100%',
-              maxWidth: '460px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              textAlign: 'center',
-              alignItems: 'center',
-            }}>
-              <h1 style={{
-                fontSize: '3rem',
-                fontWeight: 900,
-                lineHeight: 1,
-                marginBottom: '2px',
-                letterSpacing: '0.03em',
-                whiteSpace: 'nowrap',
-                animation: 'oopsRedPulse 1.35s ease-in-out infinite',
-              }}>
-                Upps...
-              </h1>
-              <p style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 700, marginBottom: '2px' }}>
-                nie ma już takiego pokoju
-              </p>
-              <p style={{ color: 'rgba(255,255,255,0.72)', fontSize: '0.92rem', marginBottom: '8px' }}>
-                Możesz utworzyć własny pokój i zaprosić znajomych.
-              </p>
-              <button
-                className="btn"
-                style={{
-                  width: '100%',
-                  maxWidth: '360px',
-                  fontSize: '1.03rem',
-                  padding: '16px 20px',
-                  minHeight: '56px',
-                  background: 'linear-gradient(135deg, #8B0000 0%, #B22222 52%, #DC143C 100%)',
-                  border: '2px solid rgba(139, 0, 0, 0.95)',
-                  color: '#ffffff',
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  borderRadius: '12px',
-                  boxShadow: '0 8px 28px rgba(139, 0, 0, 0.55), 0 0 16px rgba(139, 0, 0, 0.62)',
-                  textShadow: '0 1px 6px rgba(0, 0, 0, 0.7)',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-                onClick={() => {
-                  goToHomeRoute()
-                }}
-              >
-                Przejdź do strony głównej
-              </button>
-            </div>
-          </div>
-        )
-      }
-
-      return (
-        <div className="screen" style={{
-          position: 'relative',
-          background: 'linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.95) 100%)',
-          minHeight: '100vh',
-          padding: '20px'
-        }}>
+      <div className="screen">
+        <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <button
             className="btn btn-ghost btn-sm"
-            style={{
-              position: 'absolute',
-              top: 24,
-              left: 24,
-              width: 'auto',
-              height: '40px',
-              minHeight: '40px',
-              padding: '0 12px',
-              borderRadius: '8px',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              letterSpacing: '0.04em',
-              color: '#ffe8e8',
-              border: 'none',
-              background: 'rgba(8, 6, 6, 0.9)',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.35)',
-              lineHeight: 1,
-            }}
-            onClick={() => {
-              goToHomeRoute()
-            }}
-            title={t.back}
-            aria-label={t.back}
+            style={{ width: 'auto', alignSelf: 'flex-start' }}
+            onClick={() => setMode('home')}
           >
-            ← Wróć
+            {t.back}
           </button>
-
-          <div style={{
-            width: '100%',
-            maxWidth: '460px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '16px'
-          }}>
-            <div style={{ textAlign: 'center', marginTop: '8px' }}>
-              <h1 style={{ fontSize: '1.65rem', fontWeight: 800, marginBottom: '8px', color: '#fff' }}>
-                Witaj w pokoju {roomCode}
-              </h1>
-            </div>
-
-            <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '4px' }}>
+          <div>
+            <p className="label-cap" style={{ marginBottom: '4px' }}>{t.home.newGame}</p>
+            <h2 style={{ fontSize: '1.6rem' }}>{t.home.createRoom}</h2>
+          </div>
+          <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div>
+              <p className="label-cap" style={{ marginBottom: '6px' }}>{t.home.nickname}</p>
               <input
                 type="text"
                 placeholder={t.home.nickPlaceholder}
@@ -418,165 +47,57 @@ export default function HomeScreen({ state, actions, initialJoinCode = '' }) {
                 maxLength={20}
                 onChange={e => setNick(e.target.value)}
                 autoFocus
-                style={{
-                  fontSize: '1.25rem',
-                  padding: '18px 20px',
-                  borderRadius: '12px',
-                  background: 'rgba(0, 0, 0, 0.45)',
-                  border: '1.5px solid rgba(255,255,255,0.14)',
-                  color: '#fff',
-                  textAlign: 'center',
-                  fontWeight: 600,
-                }}
               />
-
-              <button
-                type="submit"
-                disabled={!nick.trim() || !roomCode.trim()}
-                className="btn"
-                style={{
-                  fontSize: '1.03rem',
-                  padding: '16px 20px',
-                  minHeight: '56px',
-                  background: (!nick.trim() || !roomCode.trim())
-                    ? 'rgba(139, 0, 0, 0.26)'
-                    : 'linear-gradient(135deg, #8B0000 0%, #B22222 52%, #DC143C 100%)',
-                  border: '2px solid rgba(139, 0, 0, 0.95)',
-                  color: '#ffffff',
-                  fontWeight: 800,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  borderRadius: '12px',
-                  boxShadow: (!nick.trim() || !roomCode.trim())
-                    ? 'none'
-                    : '0 8px 28px rgba(139, 0, 0, 0.55), 0 0 16px rgba(139, 0, 0, 0.62)',
-                  textShadow: '0 1px 6px rgba(0, 0, 0, 0.7)',
-                  cursor: (!nick.trim() || !roomCode.trim()) ? 'not-allowed' : 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {t.home.joinBtn}
-              </button>
-            </form>
-          </div>
+            </div>
+            <button className="btn btn-primary" type="submit" disabled={!nick.trim()} style={{ marginTop: '4px' }}>
+              {t.home.createGame}
+            </button>
+          </form>
         </div>
-      )
-    }
+      </div>
+    )
+  }
 
+  if (mode === 'join') {
     return (
-      <div className="screen" style={{
-        position: 'relative',
-        background: 'linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.95) 100%)',
-        minHeight: '100vh',
-        padding: '20px'
-      }}>
-        <button
-          className="btn btn-ghost btn-sm"
-          style={{
-            position: 'absolute',
-            top: 24,
-            left: 24,
-            width: 'auto',
-            height: '40px',
-            minHeight: '40px',
-            padding: '0 12px',
-            borderRadius: '8px',
-            fontSize: '0.85rem',
-            fontWeight: 700,
-            letterSpacing: '0.04em',
-            color: '#ffe8e8',
-            border: 'none',
-            background: 'rgba(8, 6, 6, 0.9)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.35)',
-            lineHeight: 1,
-          }}
-          onClick={() => {
-            setJoinCodeError('')
-            setRoomCode('')
-            setMode('home')
-          }}
-          title={t.back}
-          aria-label={t.back}
-        >
-          ← Wróć
-        </button>
-
-        <div style={{
-          width: '100%',
-          maxWidth: '460px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px'
-        }}>
-          <div style={{ textAlign: 'center', marginTop: '8px' }}>
-            <h1 style={{ fontSize: '1.85rem', fontWeight: 800, marginBottom: '8px', color: '#fff' }}>
-              Wpisz kod pokoju
-            </h1>
+      <div className="screen">
+        <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <button
+            className="btn btn-ghost btn-sm"
+            style={{ width: 'auto', alignSelf: 'flex-start' }}
+            onClick={() => setMode('home')}
+          >
+            {t.back}
+          </button>
+          <div>
+            <p className="label-cap" style={{ marginBottom: '4px' }}>{t.home.join}</p>
+            <h2 style={{ fontSize: '1.6rem' }}>{t.home.joinTitle}</h2>
           </div>
-
-          <form onSubmit={handleJoinCodeStep} style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '4px' }}>
-            <input
-              type="text"
-              placeholder={t.home.roomCodePlaceholder}
-              value={roomCode}
-              maxLength={6}
-              autoFocus
-              style={{
-                fontSize: '1.35rem',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                padding: '18px 20px',
-                borderRadius: '12px',
-                background: 'rgba(0, 0, 0, 0.45)',
-                border: '1.5px solid rgba(255,255,255,0.14)',
-                color: '#fff',
-                textAlign: 'center',
-                fontWeight: 700,
-              }}
-              onChange={e => {
-                setRoomCode(e.target.value.toUpperCase())
-                if (joinCodeError) setJoinCodeError('')
-              }}
-            />
-
-            {joinCodeError && (
-              <p style={{
-                color: '#ff7b7b',
-                textAlign: 'center',
-                fontSize: '0.95rem',
-                marginTop: '-4px',
-              }}>
-                {joinCodeError}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={!roomCode.trim() || checkingJoinCode}
-              className="btn"
-              style={{
-                fontSize: '1.03rem',
-                padding: '16px 20px',
-                minHeight: '56px',
-                background: (!roomCode.trim() || checkingJoinCode)
-                  ? 'rgba(139, 0, 0, 0.26)'
-                  : 'linear-gradient(135deg, #8B0000 0%, #B22222 52%, #DC143C 100%)',
-                border: '2px solid rgba(139, 0, 0, 0.95)',
-                color: '#ffffff',
-                fontWeight: 800,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                borderRadius: '12px',
-                boxShadow: (!roomCode.trim() || checkingJoinCode)
-                  ? 'none'
-                  : '0 8px 28px rgba(139, 0, 0, 0.55), 0 0 16px rgba(139, 0, 0, 0.62)',
-                textShadow: '0 1px 6px rgba(0, 0, 0, 0.7)',
-                cursor: (!roomCode.trim() || checkingJoinCode) ? 'not-allowed' : 'pointer',
-                opacity: checkingJoinCode ? 0.78 : 1,
-                transition: 'all 0.2s ease',
-              }}
-            >
-              {checkingJoinCode ? 'Sprawdzanie...' : 'Dalej'}
+          <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div>
+              <p className="label-cap" style={{ marginBottom: '6px' }}>{t.home.nickname}</p>
+              <input
+                type="text"
+                placeholder={t.home.nickPlaceholder}
+                value={nick}
+                maxLength={20}
+                onChange={e => setNick(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div>
+              <p className="label-cap" style={{ marginBottom: '6px' }}>{t.home.roomCode}</p>
+              <input
+                type="text"
+                placeholder={t.home.roomCodePlaceholder}
+                value={roomCode}
+                maxLength={6}
+                style={{ letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 800, fontSize: '1.2rem' }}
+                onChange={e => setRoomCode(e.target.value.toUpperCase())}
+              />
+            </div>
+            <button className="btn btn-primary" type="submit" disabled={!nick.trim() || !roomCode.trim()} style={{ marginTop: '4px' }}>
+              {t.home.joinBtn}
             </button>
           </form>
         </div>
@@ -611,8 +132,8 @@ export default function HomeScreen({ state, actions, initialJoinCode = '' }) {
       <div className="screen" style={{ 
         justifyContent: 'center', 
         backgroundImage: 'url(/image.png)',
-        backgroundSize: window.innerWidth <= 768 ? '170%' : '120%',
-        backgroundPosition: window.innerWidth <= 768 ? 'center 50px' : 'center 20px',
+        backgroundSize: '170%',
+        backgroundPosition: 'center 50px',
         backgroundRepeat: 'no-repeat',
         backgroundAttachment: 'fixed',
         minHeight: '100vh',
@@ -745,7 +266,7 @@ export default function HomeScreen({ state, actions, initialJoinCode = '' }) {
               animation: 'bloodPulse 3s infinite ease-in-out',
               backgroundSize: '200% 200%'
             }} 
-            onClick={() => setMode('create-name')}
+            onClick={() => setMode('create')}
             onMouseEnter={(e) => {
               e.target.style.transform = 'translateY(-2px)';
               e.target.style.boxShadow = '0 20px 80px rgba(139, 0, 0, 1), 0 0 60px rgba(139, 0, 0, 1.2)';
@@ -777,11 +298,7 @@ export default function HomeScreen({ state, actions, initialJoinCode = '' }) {
               textShadow: '0 2px 12px rgba(0, 0, 0, 1), 0 0 20px rgba(255, 255, 255, 0.3)',
               cursor: 'pointer'
             }} 
-            onClick={() => {
-              setJoinCodeError('')
-              setRoomCode('')
-              setMode('join')
-            }}
+            onClick={() => setMode('join')}
             onMouseEnter={(e) => {
               e.target.style.background = 'rgba(255, 255, 255, 0.1)';
               e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)';

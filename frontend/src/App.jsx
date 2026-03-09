@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect, useRef, Suspense, lazy } from 'react'
-import { useParams } from 'react-router-dom'
 import { useWebSocket } from './hooks/useWebSocket'
 import { useLanguage } from './contexts/LanguageContext'
 import LanguageSwitcher from './components/LanguageSwitcher'
@@ -15,6 +14,7 @@ const VoteSummaryScreen = lazy(() => import('./screens/VoteSummaryScreen'))
 const VoteResultScreen = lazy(() => import('./screens/VoteResultScreen'))
 const GameOverScreen   = lazy(() => import('./screens/GameOverScreen'))
 import Toast            from './components/Toast'
+import RoleChat         from './components/RoleChat'
 import GameHUD          from './components/GameHUD'
 
 const LoadingFallback = () => (
@@ -70,12 +70,9 @@ const INITIAL_STATE = {
   chatMessages: [],       // [{fromNick, fromId, text, role, ts}]
   // Skip day
   skipDay: { count: 0, needed: 0, hasVoted: false },
-  // Last server error (used for contextual UI like invite-link failures)
-  lastError: null,
 }
 
 export default function App() {
-  const { roomCode: roomCodeFromUrl } = useParams()
   const [state, setState] = useState(INITIAL_STATE)
   const [toast, setToast] = useState(null)
   const stateRef = useRef(state)
@@ -148,7 +145,6 @@ export default function App() {
           hostId:      hid,
           round:       data.round    ?? s.round,
           isHost:      pid === hid,
-          lastError:   null,
         }))
         break
       }
@@ -171,7 +167,6 @@ export default function App() {
           role:            data.role            || s.role,
           roleDescription: data.roleDescription || s.roleDescription,
           winner:          data.winner,
-          lastError:       null,
         }))
         showToast(tRef.current.toast.reconnected, 'success')
         break
@@ -357,7 +352,6 @@ export default function App() {
       }
 
       case 'error': {
-        setState(s => ({ ...s, lastError: data.message || tRef.current.toast.error }))
         showToast(data.message || tRef.current.toast.error, 'error')
         break
       }
@@ -370,9 +364,6 @@ export default function App() {
   const sendRef = useRef(null)
 
   const handleOpen = useCallback(() => {
-    // If user opened a direct room link, let HomeScreen handle explicit join with nick.
-    if (roomCodeFromUrl) return
-
     const saved = localStorage.getItem(STORAGE_KEY)
     if (!saved) return
     try {
@@ -381,7 +372,7 @@ export default function App() {
         sendRef.current?.('rejoin', { roomCode, playerId })
       }
     } catch { /* ignore */ }
-  }, [roomCodeFromUrl])
+  }, [])
 
   const { send } = useWebSocket(handleMessage, handleOpen)
   sendRef.current = send
@@ -391,14 +382,8 @@ export default function App() {
     kickPlayer:  (targetId) => send('kick_player', { targetId }),
     skipDay:     () => { send('skip_day', {}); setState(s => ({ ...s, skipDay: { ...s.skipDay, hasVoted: true } })) },
     sendChat:    (text) => send('chat_message', { text }),
-    createRoom: (nick) => {
-      setState(s => ({ ...s, lastError: null }))
-      send('create_room', { nick })
-    },
-    joinRoom:   (roomCode, nick) => {
-      setState(s => ({ ...s, lastError: null }))
-      send('join_room', { roomCode, nick })
-    },
+    createRoom: (nick) => send('create_room', { nick }),
+    joinRoom:   (roomCode, nick) => send('join_room', { roomCode, nick }),
     updateSettings: (settings) => send('update_settings', settings),
     startGame:  () => send('start_game'),
     resetToLobby: () => {
@@ -434,7 +419,6 @@ export default function App() {
       setState(INITIAL_STATE)
     },
     setNick: (nick) => setState(s => ({ ...s, nick })),
-    clearError: () => setState(s => ({ ...s, lastError: null })),
   }
 
   // ── SEO: dynamic lang / title / meta tags ───────────────────────────────
@@ -569,7 +553,7 @@ export default function App() {
 
   const renderScreen = () => {
     switch (state.screen) {
-      case 'home':         return <HomeScreen initialJoinCode={roomCodeFromUrl || ''} {...screenProps} />
+      case 'home':         return <HomeScreen        {...screenProps} />
       case 'lobby':        return <LobbyScreen       {...screenProps} />
       case 'role_reveal':  return <RoleRevealScreen  {...screenProps} />
       case 'night':        return <NightScreen       {...screenProps} />
@@ -579,17 +563,22 @@ export default function App() {
       case 'vote_summary': return <VoteSummaryScreen {...screenProps} />
       case 'vote_result':  return <VoteResultScreen  {...screenProps} />
       case 'game_over':    return <GameOverScreen    {...screenProps} />
-      default:             return <HomeScreen initialJoinCode={roomCodeFromUrl || ''} {...screenProps} />
+      default:             return <HomeScreen        {...screenProps} />
     }
   }
 
-  const showLanguageSwitcher = state.screen === 'home' || state.screen === 'lobby'
-
   return (
     <>
-      {showLanguageSwitcher && <LanguageSwitcher />}
+      <LanguageSwitcher />
       <GameHUD state={state} />
       {renderScreen()}
+      {['night', 'day', 'voting'].includes(state.phase) && state.role && state.role !== 'villager' && (
+        <RoleChat
+          messages={state.chatMessages}
+          role={state.role}
+          onSend={actions.sendChat}
+        />
+      )}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </>
   )

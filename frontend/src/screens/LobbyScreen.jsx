@@ -3,6 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 
 function RoleHintButton({ hint }) {
   const [showModal, setShowModal] = useState(false)
+  const { t } = useLanguage()
 
   return (
     <>
@@ -20,7 +21,7 @@ function RoleHintButton({ hint }) {
           height: '20px',
         }}
         onClick={() => setShowModal(true)}
-        title="Informacja o roli"
+        title={t.lobby.roleInfo}
       >
         i
       </button>
@@ -129,7 +130,7 @@ export default function LobbyScreen({ state, actions }) {
             onClick={copyCode}
             title={t.lobby.copyHint}
           >
-            {isLinkCopied ? 'Skopiowano do schowka...' : 'Zaproś - skopiuj link'}
+            {isLinkCopied ? t.lobby.copied : t.lobby.copyLink}
           </button>
           <p className="room-code-hero-hint">{t.lobby.shareCopy}</p>
         </div>
@@ -171,10 +172,10 @@ export default function LobbyScreen({ state, actions }) {
                 textAlign: 'center',
                 letterSpacing: '0.02em',
               }}>
-                Potrzeba co najmniej 4 graczy
+                {t.lobby.needPlayers}
               </p>
               <p style={{ margin: '0 0 14px', fontSize: '0.86rem', color: 'var(--text-dim)', lineHeight: 1.45, textAlign: 'center' }}>
-                Brakuje jeszcze {missingPlayers} graczy. Zaproś znajomych linkiem do pokoju.
+                {t.lobby.missingPlayersDesc.replace('{n}', missingPlayers)}
               </p>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
@@ -185,14 +186,14 @@ export default function LobbyScreen({ state, actions }) {
                     setShowNeedPlayersModal(false)
                   }}
                 >
-                  Zaproś znajomych
+                  {t.lobby.inviteFriends}
                 </button>
                 <button
                   className="btn btn-ghost btn-sm"
                   style={{ flex: 1 }}
                   onClick={() => setShowNeedPlayersModal(false)}
                 >
-                  Zamknij
+                  {t.lobby.close}
                 </button>
               </div>
             </div>
@@ -250,7 +251,7 @@ export default function LobbyScreen({ state, actions }) {
         {/* Role settings (host only) */}
         {isHost && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <p className="label-cap" style={{ marginBottom: '8px' }}>Role</p>
+            <p className="label-cap" style={{ marginBottom: '8px' }}>{t.lobby.rolesLabel}</p>
 
             <div className="card-sm">
               <SettingRow
@@ -323,7 +324,7 @@ export default function LobbyScreen({ state, actions }) {
                 letterSpacing: '0.015em',
                 animation: 'pulse 3.2s ease-in-out infinite',
               }}>
-                Potrzeba co najmniej 4 graczy
+                {t.lobby.needPlayers}
               </p>
             )}
             <button

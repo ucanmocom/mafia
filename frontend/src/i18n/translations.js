@@ -77,7 +77,7 @@ export const translations = {
     lobby: {
       roomCode: 'Kod pokoju',
       copyHint: 'Kliknij by skopiować',
-      shareCopy: 'Podaj kod znajomym · lub kliknij by skopiować',
+      shareCopy: 'Podaj kod znajomym · kliknij by skopiować',
       players: 'Gracze',
       minimum: 'Minimum',
       status: 'Status',
@@ -92,8 +92,15 @@ export const translations = {
       tooManySpecial: 'Za dużo specjalnych ról',
       settings: 'Ustawienia',
       startGame: 'Rozpocznij grę',
-      waitHost: 'Oczekiwanie na start',
+      waitHost: 'Czekaj na hosta…',
       leaveRoom: 'Opuść pokój',
+      copied: 'Skopiowano do schowka…',
+      copyLink: 'Zaproś – skopiuj link',
+      missingPlayersDesc: 'Brakuje jeszcze {n} graczy. Zaproś znajomych linkiem do pokoju.',
+      inviteFriends: 'Zaproś znajomych',
+      close: 'Zamknij',
+      rolesLabel: 'Role',
+      roleInfo: 'Informacja o roli',
     },
 
     phases: {
@@ -325,6 +332,13 @@ export const translations = {
       startGame: 'Start game',
       waitHost: 'Waiting for host…',
       leaveRoom: 'Leave room',
+      copied: 'Copied to clipboard…',
+      copyLink: 'Invite – copy link',
+      missingPlayersDesc: 'Still need {n} more players. Share the room link with friends.',
+      inviteFriends: 'Invite friends',
+      close: 'Close',
+      rolesLabel: 'Roles',
+      roleInfo: 'Role information',
     },
 
     phases: {
@@ -556,6 +570,13 @@ export const translations = {
       startGame: 'Démarrer la partie',
       waitHost: 'En attente de l\'hôte…',
       leaveRoom: 'Quitter la salle',
+      copied: 'Copié dans le presse-papiers…',
+      copyLink: 'Inviter – copier le lien',
+      missingPlayersDesc: 'Il manque encore {n} joueurs. Partagez le lien de la salle.',
+      inviteFriends: 'Inviter des amis',
+      close: 'Fermer',
+      rolesLabel: 'Rôles',
+      roleInfo: 'Informations sur le rôle',
     },
 
     phases: {
@@ -787,6 +808,13 @@ export const translations = {
       startGame: 'Spiel starten',
       waitHost: 'Auf den Host warten…',
       leaveRoom: 'Raum verlassen',
+      copied: 'In die Zwischenablage kopiert…',
+      copyLink: 'Einladen – Link kopieren',
+      missingPlayersDesc: 'Es fehlen noch {n} Spieler. Teile den Raumlink mit Freunden.',
+      inviteFriends: 'Freunde einladen',
+      close: 'Schließen',
+      rolesLabel: 'Rollen',
+      roleInfo: 'Rolleninformation',
     },
 
     phases: {

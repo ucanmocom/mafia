@@ -50,6 +50,7 @@ const EVENTS = {
   ROLE_ASSIGNED:     'role_assigned',
   PHASE_CHANGE:      'phase_change',
   NIGHT_RESULT:      'night_result',
+  VOTE_ACK:          'vote_ack',
   VOTE_UPDATE:       'vote_update',
   SKIP_DAY_UPDATE:   'skip_day_update',
   VOTE_SUMMARY:      'vote_summary',

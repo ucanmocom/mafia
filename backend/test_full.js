@@ -313,6 +313,10 @@ section('12. Mafia count rule: >1 mafia needs ≥6 players');
 section('13. Night complete only when all actions in');
 {
   const { gm, room, byRole } = buildRoom({ mafiaCount: 1, doctorCount: 1, detectiveCount: 1 });
+  // isNightComplete counts only connected players (readyState === 1), so mock active sockets.
+  for (const p of Object.values(room.players)) {
+    p.ws = { readyState: 1 };
+  }
   assert('Night not complete at start', !gm.isNightComplete(room.code));
   gm.recordNightAction(room.code, byRole.mafia[0].id,   byRole.villager[0].id);
   assert('Night not complete after 1 action', !gm.isNightComplete(room.code));

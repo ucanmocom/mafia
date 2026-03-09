@@ -107,6 +107,7 @@ export default function VotingScreen({ state, actions }) {
   const isAlive      = myPlayer ? myPlayer.isAlive !== false : true
   const myRoleLabel  = role ? (t.roles?.[role] || role) : '-'
   const alivePlayers = players.filter(p => p.isAlive !== false)
+  const eligibleVoters = players.filter(p => p.isAlive !== false && p.isConnected !== false)
   const totalVotes   = Object.values(votes).reduce((a, b) => a + b, 0)
   const votedCountDisplay = Math.max(Number(votedCount) || 0, totalVotes)
   const timerColor   = timeLeft <= 10 ? 'var(--red-bright)' : 'var(--text)'
@@ -300,7 +301,7 @@ export default function VotingScreen({ state, actions }) {
             </div>
             <div className="stat-col">
               <span className="stat-label">{t.voting.voted}</span>
-              <span className="stat-value">{votedCountDisplay}/{alivePlayers.length}</span>
+              <span className="stat-value">{votedCountDisplay}/{eligibleVoters.length}</span>
             </div>
             <div className="stat-col">
               <span className="stat-label">{t.voting.round}</span>

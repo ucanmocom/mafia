@@ -10,8 +10,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <LanguageProvider>
         <Routes>
-          <Route path="/:lang/room/:roomCode" element={<App />} />
-          <Route path="/room/:roomCode" element={<App />} />
           <Route path="/:lang" element={<App />} />
           <Route path="/" element={<Navigate to="/pl" replace />} />
         </Routes>
