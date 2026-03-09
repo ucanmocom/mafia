@@ -255,7 +255,7 @@ export default function LobbyScreen({ state, actions }) {
 
             <div className="card-sm">
               <SettingRow
-                label="Mafiosi"
+                label={t.lobby.mafiosi}
                 value={localSettings.mafiaCount}
                 min={1}
                 max={Math.max(1, Math.floor(alivePlayers.length / 3))}
