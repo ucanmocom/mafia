@@ -1,12 +1,22 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useLanguage } from '../contexts/LanguageContext'
 import { Moon, MessageCircle, Vote } from 'lucide-react'
 
 export default function HomeScreen({ state, actions }) {
   const { t } = useLanguage()
+  const [searchParams] = useSearchParams()
   const [nick, setNick]         = useState('')
   const [roomCode, setRoomCode] = useState('')
   const [mode, setMode]         = useState('home') // 'home' | 'create' | 'join'
+
+  useEffect(() => {
+    const joinCode = searchParams.get('join')
+    if (joinCode) {
+      setRoomCode(joinCode.toUpperCase())
+      setMode('join')
+    }
+  }, [])
 
   const handleCreate = (e) => {
     e.preventDefault()
