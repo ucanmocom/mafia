@@ -415,6 +415,7 @@ export default function App() {
       setState(s => ({ ...s, hasVoted: true }))
     },
     leaveRoom:  () => {
+      send('leave_room', {})
       localStorage.removeItem(STORAGE_KEY)
       setState(INITIAL_STATE)
     },

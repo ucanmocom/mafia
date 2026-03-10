@@ -44,6 +44,7 @@ const EVENTS = {
   KICK_PLAYER:    'kick_player',
   SKIP_DAY:       'skip_day',
   CHAT_MESSAGE:   'chat_message',
+  LEAVE_ROOM:     'leave_room',
 
   // Server → Client
   ROOM_UPDATE:       'room_update',

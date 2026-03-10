@@ -314,15 +314,16 @@ class GameManager {
     const aliveDetective = alive.filter((p) => p.role === ROLES.DETECTIVE);
 
     // Count ONLY CONNECTED players (who can actually send night_action event)
-    const connectedMafia = aliveMafia.filter((p) => p.ws && p.ws.readyState === 1);
-    const connectedDoctor = aliveDoctor.filter((p) => p.ws && p.ws.readyState === 1);
-    const connectedDetective = aliveDetective.filter((p) => p.ws && p.ws.readyState === 1);
+    const connectedMafia = aliveMafia.filter((p) => p.isConnected !== false);
+    const connectedDoctor = aliveDoctor.filter((p) => p.isConnected !== false);
+    const connectedDetective = aliveDetective.filter((p) => p.isConnected !== false);
 
     // ALL CONNECTED alive mafia must vote
     if (connectedMafia.length > 0) {
-      const votedMafia = Object.keys(room.nightActions.mafiaVotes).length;
-      if (votedMafia < connectedMafia.length) {
-        console.log(`[night] Mafia incomplete: ${votedMafia}/${connectedMafia.length} voted`);
+      const connectedMafiaIds = connectedMafia.map(p => p.id);
+      const missing = connectedMafiaIds.filter(id => !room.nightActions.mafiaVotes[id]);
+      if (missing.length > 0) {
+        console.log(`[night] Mafia incomplete: ${connectedMafiaIds.length - missing.length}/${connectedMafiaIds.length} voted`);
         return false;
       }
     }
@@ -530,11 +531,11 @@ class GameManager {
 
   migrateHost(room) {
     const connected = Object.values(room.players).filter(
-      (p) => p.isConnected && p.id !== room.hostId
+      (p) => p.isConnected !== false && p.id !== room.hostId
     );
     if (connected.length === 0) return null;
     const newHost = connected[0];
-    room.players[room.hostId].isHost = false; // old host flag off first
+    if (room.players[room.hostId]) room.players[room.hostId].isHost = false; // old host may already be removed
     newHost.isHost = true;
     room.hostId = newHost.id;
     return newHost;

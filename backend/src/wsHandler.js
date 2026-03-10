@@ -182,6 +182,7 @@ function triggerVoting(room, gameManager) {
 }
 
 function doResolveNight(room, gameManager) {
+  if (room.phase !== PHASES.NIGHT) return; // guard: prevent double-resolve
   clearPhaseTimer(room);
   const { killed, detectiveResults, loverKilled, wasRandom, mafiaTarget } = gameManager.resolveNight(room.code);
 
@@ -198,15 +199,8 @@ function doResolveNight(room, gameManager) {
     }
   }
 
-  // Each detective gets their own private result immediately
-  for (const dr of (detectiveResults || [])) {
-    const detective = room.players[dr.detectiveId];
-    send(detective?.ws, EVENTS.NIGHT_RESULT, {
-      personal: true,
-      isMafia:    dr.isMafia,
-      targetNick: dr.target.nick,
-    });
-  }
+  // Each detective gets their own private result immediately upon pick (sent in NIGHT_ACTION handler).
+  // Do NOT re-send here to avoid duplicate popup/toast during voting.
 
   // Everyone gets public night result
   broadcast(room, EVENTS.NIGHT_RESULT, {
@@ -401,6 +395,59 @@ function handleConnection(ws, gameManager) {
 
         // Public: notify room
         broadcastRoomUpdate(room);
+        break;
+      }
+
+      // ── LEAVE ROOM ─────────────────────────────────────────────────────────
+      case EVENTS.LEAVE_ROOM: {
+        if (!currentRoomCode) break;
+        const leaveRoom = gameManager.getRoom(currentRoomCode);
+        if (!leaveRoom) break;
+
+        const leavingPlayer = leaveRoom.players[currentPlayerId];
+        if (!leavingPlayer) break;
+
+        // Remove the player from the room entirely
+        delete leaveRoom.players[currentPlayerId];
+
+        // If nobody left – clean up the room
+        if (Object.keys(leaveRoom.players).length === 0) {
+          clearPhaseTimer(leaveRoom);
+          gameManager.rooms.delete(currentRoomCode);
+          break;
+        }
+
+        // If the leaver was the host – migrate immediately
+        if (leaveRoom.hostId === currentPlayerId) {
+          if (leaveRoom.hostMigrateTimer) {
+            clearTimeout(leaveRoom.hostMigrateTimer);
+            leaveRoom.hostMigrateTimer = null;
+          }
+          gameManager.migrateHost(leaveRoom);
+        }
+
+        // Always broadcast the updated room to remaining players
+        broadcastRoomUpdate(leaveRoom);
+
+        // If an in-progress phase can now complete, resolve it
+        if (leaveRoom.phase === PHASES.NIGHT && gameManager.isNightComplete(leaveRoom.code)) {
+          doResolveNight(leaveRoom, gameManager);
+        } else if (leaveRoom.phase === PHASES.VOTING) {
+          const eligibleVoters = Object.values(leaveRoom.players).filter(
+            (p) => p.isAlive && p.isConnected !== false
+          );
+          const votedCount = Object.keys(leaveRoom.votes).filter((vid) => {
+            const v = leaveRoom.players[vid];
+            return v && v.isAlive && v.isConnected !== false;
+          }).length;
+          if (eligibleVoters.length > 0 && votedCount >= eligibleVoters.length) {
+            doResolveVoting(leaveRoom, gameManager);
+          }
+        }
+
+        // Clean up the leaving ws so close handler doesn't double-process
+        currentRoomCode = null;
+        currentPlayerId = null;
         break;
       }
 
@@ -605,6 +652,11 @@ function handleConnection(ws, gameManager) {
       player.isConnected = false;
       player.ws = null;
       broadcastRoomUpdate(room);
+
+      // If the disconnected player had a pending night action, check if night is now complete
+      if (room.phase === PHASES.NIGHT && gameManager.isNightComplete(room.code)) {
+        doResolveNight(room, gameManager);
+      }
 
       // Host migration – delayed 5 min so a brief disconnect / page refresh doesn't transfer host
       if (room.hostId === currentPlayerId && room.phase !== PHASES.GAME_OVER) {

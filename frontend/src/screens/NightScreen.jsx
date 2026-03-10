@@ -185,10 +185,21 @@ function DetectiveNight({ targets, nightActionDone, detectiveResult, onPick, t }
       {showResult && detectiveResult && (
         <div className={detectiveResult.isMafia ? 'detective-popup' : 'detective-popup safe'}>
           <button
-            className="btn btn-ghost btn-sm"
-            style={{ position: 'absolute', top: '8px', right: '8px', padding: '4px 8px' }}
+            style={{
+              position: 'absolute', top: '10px', right: '10px',
+              width: '32px', height: '32px',
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.15)',
+              border: '2px solid rgba(255,255,255,0.4)',
+              color: '#fff',
+              fontSize: '1rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              lineHeight: 1,
+            }}
             onClick={() => setShowResult(false)}
-            title="Zamknij"
+            title={t.lobby.close}
           >
             ✕
           </button>
