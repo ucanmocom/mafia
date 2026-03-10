@@ -405,10 +405,12 @@ export default function App() {
     nightAction:(targetId) => send('night_action', { targetId }),
     vote:        (targetId) => {
       const currentState = stateRef.current
-      // Cannot vote for self or lover
+      // Cannot vote for self or lover – show error but auto-cast abstain so they're counted as voted
       if (targetId === currentState.playerId || targetId === currentState.loverId) {
         const targetPlayer = currentState.players.find(p => p.id === targetId)
         setState(s => ({ ...s, cannotVoteLoverError: targetPlayer?.nick || 'Unknown' }))
+        send('vote', { targetId: 'skip' })
+        setState(s => ({ ...s, hasVoted: true }))
         return
       }
       send('vote', { targetId })
