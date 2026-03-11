@@ -223,10 +223,12 @@ function doResolveVoting(room, gameManager) {
   const voteDisplay = {};
   for (const [voterId, targetId] of Object.entries(room.votes)) {
     const voter = room.players[voterId];
-    const target = room.players[targetId];
-    if (voter && target) {
-      const voterNick = voter.nick;
-      voteDisplay[voterNick] = targetId === 'skip' ? '⏭ Pomiń' : target.nick;
+    if (!voter) continue;
+    if (targetId === 'skip') {
+      voteDisplay[voter.nick] = '⏭ Pomiń';
+    } else {
+      const target = room.players[targetId];
+      if (target) voteDisplay[voter.nick] = target.nick;
     }
   }
 
@@ -248,9 +250,10 @@ function broadcastGameOver(room, winner) {
   clearPhaseTimer(room);
   // Reveal all roles on game over
   const reveal = Object.values(room.players).map((p) => ({
-    id:   p.id,
-    nick: p.nick,
-    role: p.role,
+    id:      p.id,
+    nick:    p.nick,
+    role:    p.role,
+    isAlive: p.isAlive,
   }));
   broadcast(room, EVENTS.GAME_OVER, { winner, players: reveal });
 }
@@ -584,7 +587,7 @@ function handleConnection(ws, gameManager) {
         const chatRoom = gameManager.getRoom(currentRoomCode);
         if (!chatRoom) return;
         const sender = chatRoom.players[currentPlayerId];
-        if (!sender || !sender.role || sender.role === ROLES.VILLAGER) return;
+        if (!sender || !sender.isAlive || !sender.role || sender.role === ROLES.VILLAGER) return;
         const text = (data.text || '').trim().slice(0, 300);
         if (!text) return;
         // Route only to players with the same role
@@ -619,10 +622,11 @@ function handleConnection(ws, gameManager) {
         for (const targetId of Object.values(room.votes)) {
           tally[targetId] = (tally[targetId] || 0) + 1;
         }
-        const eligibleVoters = Object.values(room.players).filter((p) => p.isAlive && p.isConnected !== false);
+        // All alive players must vote (disconnected players are still eligible – timer resolves if they don't return)
+        const eligibleVoters = Object.values(room.players).filter((p) => p.isAlive);
         const votedCount = Object.keys(room.votes).filter((voterId) => {
           const voter = room.players[voterId];
-          return voter && voter.isAlive && voter.isConnected !== false;
+          return voter && voter.isAlive;
         }).length;
         console.log(`[vote] Player ${room.players[currentPlayerId]?.nick} voted for ${room.players[data.targetId]?.nick || 'skip'}. Votes: ${votedCount}/${eligibleVoters.length}`);
         broadcast(room, EVENTS.VOTE_UPDATE, { tally, votedCount });

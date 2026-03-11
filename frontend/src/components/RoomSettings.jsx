@@ -1,4 +1,5 @@
 import { Settings, Clock, Users } from 'lucide-react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 function SettingRow({ label, value, onDec, onInc }) {
   return (
@@ -53,6 +54,7 @@ function SectionHeader({ icon: Icon, title }) {
 }
 
 export default function RoomSettings({ roomCode, players, nick, playerId, settings, onChange, onSave }) {
+  const { t } = useLanguage()
   const set = (key, val) => onChange({ ...settings, [key]: val })
 
   return (
@@ -67,7 +69,7 @@ export default function RoomSettings({ roomCode, players, nick, playerId, settin
         boxShadow: '0 0 24px rgba(139,26,22,0.25)',
       }}>
         <p style={{ margin: '0 0 4px', fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-          Kod pokoju
+          {t.settings.roomCode}
         </p>
         <span style={{
           fontSize: '3rem', fontWeight: '900', color: '#fff',
@@ -77,19 +79,19 @@ export default function RoomSettings({ roomCode, players, nick, playerId, settin
           {roomCode}
         </span>
         <p style={{ margin: '6px 0 0', fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)' }}>
-          Podaj ten kod innym graczom
+          {t.settings.shareCode}
         </p>
       </div>
 
       {/* Gracze */}
       <div className="card" style={{ padding: '16px 18px' }}>
-        <SectionHeader icon={Users} title={`Gracze (${players?.length || 1})`} />
+        <SectionHeader icon={Users} title={`${t.lobby.players} (${players?.length || 1})`} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '10px' }}>
           {/* Gospodarz */}
           <div style={playerRowStyle(true)}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--red-bright)', flexShrink: 0, display: 'inline-block' }} />
             <span style={{ fontWeight: '600', fontSize: '0.9rem', flex: 1 }}>{nick}</span>
-            <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', fontWeight: 400 }}>gospodarz</span>
+            <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', fontWeight: 400 }}>{t.settings.host}</span>
           </div>
           {/* Pozostali */}
           {players?.filter(p => p.id !== playerId).map(player => (
@@ -103,20 +105,20 @@ export default function RoomSettings({ roomCode, players, nick, playerId, settin
 
       {/* Skład ról */}
       <div className="card" style={{ padding: '16px 18px' }}>
-        <SectionHeader icon={Settings} title="Skład ról" />
-        <SettingRow label="Mafia" value={settings.mafiaCount}
+        <SectionHeader icon={Settings} title={t.settings.rolesComposition} />
+        <SettingRow label={t.settings.mafia} value={settings.mafiaCount}
           onDec={() => set('mafiaCount', Math.max(1, settings.mafiaCount - 1))}
           onInc={() => set('mafiaCount', Math.min(5, settings.mafiaCount + 1))}
         />
-        <SettingRow label="Lekarze" value={settings.doctorCount}
+        <SettingRow label={t.settings.doctors} value={settings.doctorCount}
           onDec={() => set('doctorCount', Math.max(0, settings.doctorCount - 1))}
           onInc={() => set('doctorCount', Math.min(3, settings.doctorCount + 1))}
         />
-        <SettingRow label="Detektywi" value={settings.detectiveCount}
+        <SettingRow label={t.settings.detectives} value={settings.detectiveCount}
           onDec={() => set('detectiveCount', Math.max(0, settings.detectiveCount - 1))}
           onInc={() => set('detectiveCount', Math.min(3, settings.detectiveCount + 1))}
         />
-        <SettingRow label="Para zakochanych" value={settings.loversCount}
+        <SettingRow label={t.settings.loversPair} value={settings.loversCount}
           onDec={() => set('loversCount', Math.max(0, settings.loversCount - 1))}
           onInc={() => set('loversCount', Math.min(1, settings.loversCount + 1))}
         />
@@ -124,12 +126,12 @@ export default function RoomSettings({ roomCode, players, nick, playerId, settin
 
       {/* Czas rund */}
       <div className="card" style={{ padding: '16px 18px' }}>
-        <SectionHeader icon={Clock} title="Czas rund" />
-        <SettingRow label="Dyskusja dzienna" value={`${settings.dayDuration / 1000}s`}
+        <SectionHeader icon={Clock} title={t.settings.roundTimes} />
+        <SettingRow label={t.settings.dayDiscussion} value={`${settings.dayDuration / 1000}s`}
           onDec={() => set('dayDuration', Math.max(60000, settings.dayDuration - 10000))}
           onInc={() => set('dayDuration', Math.min(300000, settings.dayDuration + 10000))}
         />
-        <SettingRow label="Faza nocna" value={`${settings.nightDuration / 1000}s`}
+        <SettingRow label={t.settings.nightPhase} value={`${settings.nightDuration / 1000}s`}
           onDec={() => set('nightDuration', Math.max(30000, settings.nightDuration - 10000))}
           onInc={() => set('nightDuration', Math.min(180000, settings.nightDuration + 10000))}
         />
@@ -140,7 +142,7 @@ export default function RoomSettings({ roomCode, players, nick, playerId, settin
         style={{ width: '100%', padding: '15px', fontSize: '1rem', fontWeight: '700', marginTop: '4px' }}
         onClick={onSave}
       >
-        Zapisz ustawienia
+        {t.settings.save}
       </button>
 
     </div>

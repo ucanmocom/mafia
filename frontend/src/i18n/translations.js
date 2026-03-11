@@ -3,6 +3,8 @@ export const translations = {
     back: '← Wróć',
     you: 'ty',
     offline: 'offline',
+    close: 'Zamknij',
+    switchLanguage: 'Zmień język',
 
     home: {
       newGame: 'Nowa gra',
@@ -102,6 +104,7 @@ export const translations = {
       close: 'Zamknij',
       rolesLabel: 'Role',
       roleInfo: 'Informacja o roli',
+      host: 'Gospodarz',
     },
 
     phases: {
@@ -183,6 +186,13 @@ export const translations = {
       skipElim: '⏭ Nie eliminuj nikogo',
       innocent: 'NIEWINNY',
       disappears: 'znika za',
+      cannotVoteLover: 'Nie możesz głosować na',
+      loverBadge: 'Zakochany/a',
+      closesIn: 'Zamknięcie za',
+      whoEliminate: 'Kogo eliminujemy?',
+      abstain: 'Wstrzymuję się',
+      playerLabel: 'Gracz:',
+      roleLabel: 'Rola:',
     },
 
     voteSummary: {
@@ -236,12 +246,29 @@ export const translations = {
       kicked: 'Zostałeś wyrzucony przez hosta.',
       error: 'Błąd',
     },
+
+    settings: {
+      roomCode: 'Kod pokoju',
+      shareCode: 'Podaj ten kod innym graczom',
+      host: 'gospodarz',
+      rolesComposition: 'Skład ról',
+      mafia: 'Mafia',
+      doctors: 'Lekarze',
+      detectives: 'Detektywi',
+      loversPair: 'Para zakochanych',
+      roundTimes: 'Czas rund',
+      dayDiscussion: 'Dyskusja dzienna',
+      nightPhase: 'Faza nocna',
+      save: 'Zapisz ustawienia',
+    },
   },
 
   en: {
     back: '← Back',
     you: 'you',
     offline: 'offline',
+    close: 'Close',
+    switchLanguage: 'Switch language',
 
     home: {
       newGame: 'New game',
@@ -341,6 +368,7 @@ export const translations = {
       close: 'Close',
       rolesLabel: 'Roles',
       roleInfo: 'Role information',
+      host: 'Host',
     },
 
     phases: {
@@ -422,6 +450,13 @@ export const translations = {
       skipElim: '⏭ Skip elimination',
       innocent: 'INNOCENT',
       disappears: 'disappears in',
+      cannotVoteLover: 'You cannot vote for',
+      loverBadge: 'In love',
+      closesIn: 'Closes in',
+      whoEliminate: 'Who do we eliminate?',
+      abstain: 'Abstain',
+      playerLabel: 'Player:',
+      roleLabel: 'Role:',
     },
 
     voteSummary: {
@@ -475,12 +510,29 @@ export const translations = {
       kicked: 'You were kicked by the host.',
       error: 'Error',
     },
+
+    settings: {
+      roomCode: 'Room code',
+      shareCode: 'Share this code with other players',
+      host: 'host',
+      rolesComposition: 'Role composition',
+      mafia: 'Mafia',
+      doctors: 'Doctors',
+      detectives: 'Detectives',
+      loversPair: 'Lovers pair',
+      roundTimes: 'Round times',
+      dayDiscussion: 'Day discussion',
+      nightPhase: 'Night phase',
+      save: 'Save settings',
+    },
   },
 
   fr: {
     back: '← Retour',
     you: 'toi',
     offline: 'hors ligne',
+    close: 'Fermer',
+    switchLanguage: 'Changer de langue',
 
     home: {
       newGame: 'Nouvelle partie',
@@ -580,6 +632,7 @@ export const translations = {
       close: 'Fermer',
       rolesLabel: 'Rôles',
       roleInfo: 'Informations sur le rôle',
+      host: 'Hôte',
     },
 
     phases: {
@@ -661,6 +714,13 @@ export const translations = {
       skipElim: '⏭ Ne pas éliminer',
       innocent: 'INNOCENT',
       disappears: 'disparaît dans',
+      cannotVoteLover: 'Vous ne pouvez pas voter pour',
+      loverBadge: 'Amoureux/se',
+      closesIn: 'Fermeture dans',
+      whoEliminate: 'Qui éliminons-nous ?',
+      abstain: 'Abstention',
+      playerLabel: 'Joueur :',
+      roleLabel: 'Rôle :',
     },
 
     voteSummary: {
@@ -714,12 +774,29 @@ export const translations = {
       kicked: 'Vous avez été expulsé par l\'hôte.',
       error: 'Erreur',
     },
+
+    settings: {
+      roomCode: 'Code de la salle',
+      shareCode: 'Partagez ce code avec les autres joueurs',
+      host: 'hôte',
+      rolesComposition: 'Composition des rôles',
+      mafia: 'Mafia',
+      doctors: 'Médecins',
+      detectives: 'Détectives',
+      loversPair: 'Couple d\'amoureux',
+      roundTimes: 'Durée des tours',
+      dayDiscussion: 'Discussion de jour',
+      nightPhase: 'Phase de nuit',
+      save: 'Enregistrer les paramètres',
+    },
   },
 
   de: {
     back: '← Zurück',
     you: 'du',
     offline: 'offline',
+    close: 'Schließen',
+    switchLanguage: 'Sprache wechseln',
 
     home: {
       newGame: 'Neues Spiel',
@@ -819,6 +896,7 @@ export const translations = {
       close: 'Schließen',
       rolesLabel: 'Rollen',
       roleInfo: 'Rolleninformation',
+      host: 'Gastgeber',
     },
 
     phases: {
@@ -900,6 +978,13 @@ export const translations = {
       skipElim: '⏭ Niemanden eliminieren',
       innocent: 'UNSCHULDIG',
       disappears: 'verschwindet in',
+      cannotVoteLover: 'Du kannst nicht für',
+      loverBadge: 'Verliebt',
+      closesIn: 'Schließt in',
+      whoEliminate: 'Wen eliminieren wir?',
+      abstain: 'Enthaltung',
+      playerLabel: 'Spieler:',
+      roleLabel: 'Rolle:',
     },
 
     voteSummary: {
@@ -952,6 +1037,21 @@ export const translations = {
       selected: 'Ausgewählt:',
       kicked: 'Du wurdest vom Host rausgeworfen.',
       error: 'Fehler',
+    },
+
+    settings: {
+      roomCode: 'Raumcode',
+      shareCode: 'Teile diesen Code mit anderen Spielern',
+      host: 'Gastgeber',
+      rolesComposition: 'Rollenzusammensetzung',
+      mafia: 'Mafia',
+      doctors: 'Ärzte',
+      detectives: 'Detektive',
+      loversPair: 'Liebespaar',
+      roundTimes: 'Rundenzeiten',
+      dayDiscussion: 'Tagdiskussion',
+      nightPhase: 'Nachtphase',
+      save: 'Einstellungen speichern',
     },
   },
 }

@@ -226,7 +226,7 @@ export default function LobbyScreen({ state, actions }) {
               <div key={p.id} className="player-row">
                 <div className="avatar">{p.nick[0].toUpperCase()}</div>
                 <span style={{ flex: 1, fontWeight: 500 }}>{p.nick}</span>
-                {p.id === hostId && <span className="badge">Host</span>}
+                {p.id === hostId && <span className="badge">{t.lobby.host}</span>}
                 {p.id === playerId && p.id !== hostId && (
                   <span style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{t.you}</span>
                 )}

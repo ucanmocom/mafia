@@ -68,18 +68,18 @@ function CannotVoteLoverError({ errorNick, onClose }) {
         className="btn btn-ghost btn-sm"
         style={{ position: 'absolute', top: '8px', right: '8px', padding: '4px 8px' }}
         onClick={() => onClose?.()}
-        title="Zamknij"
+        title={t.close}
       >
         ✕
       </button>
       <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>❌</div>
       <p style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '12px', color: 'var(--text)' }}>
-        Nie możesz głosować na {errorNick}
+        {t.voting.cannotVoteLover} {errorNick}
       </p>
       <span className="badge" style={{ background: 'var(--red-bright)', marginBottom: '12px' }}>
-        Zakochany/a
+        {t.voting.loverBadge}
       </span>
-      <p className="label-cap" style={{ marginTop: '12px' }}>Zamknięcie za {timer}s</p>
+      <p className="label-cap" style={{ marginTop: '12px' }}>{t.voting.closesIn} {timer}s</p>
     </div>
   )
 }
@@ -119,7 +119,7 @@ export default function VotingScreen({ state, actions }) {
 
   const tallyEntries = Object.entries(votes).map(([id, count]) => ({
     id,
-    nick: id === 'skip' ? 'Abstain' : (players.find(p => p.id === id)?.nick ?? id),
+    nick: id === 'skip' ? t.voting.abstain : (players.find(p => p.id === id)?.nick ?? id),
     count,
     isSkip: id === 'skip',
   })).sort((a, b) => b.count - a.count)
@@ -157,9 +157,9 @@ export default function VotingScreen({ state, actions }) {
             alignItems: 'center',
           }}>
             <p style={{ margin: 0, fontSize: '0.94rem', color: 'var(--text-dim)', textAlign: 'center' }}>
-              Gracz: <span style={{ color: 'var(--text)', fontWeight: 800 }}>{myPlayer?.nick || '-'}</span>
+              {t.voting.playerLabel} <span style={{ color: 'var(--text)', fontWeight: 800 }}>{myPlayer?.nick || '-'}</span>
               <span style={{ color: 'var(--border2)', margin: '0 8px' }}>·</span>
-              Rola: <span style={{ color: 'var(--text)', fontWeight: 800 }}>{myRoleLabel}</span>
+              {t.voting.roleLabel} <span style={{ color: 'var(--text)', fontWeight: 800 }}>{myRoleLabel}</span>
             </p>
           </div>
         </div>
@@ -199,7 +199,7 @@ export default function VotingScreen({ state, actions }) {
             color: '#f7f1f1',
             textShadow: '0 0 10px rgba(255,255,255,0.18), 0 0 20px rgba(139, 0, 0, 0.4)',
           }}>
-            Kogo eliminujemy?
+            {t.voting.whoEliminate}
           </p>
           {!isAlive ? (
             <p style={{ marginBottom: '4px', fontSize: '0.9rem', color: 'var(--text-muted)' }}>{t.voting.spectating}</p>

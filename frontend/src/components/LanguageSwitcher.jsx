@@ -32,7 +32,7 @@ export default function LanguageSwitcher() {
     >
       <button
         onClick={() => setOpen(o => !o)}
-        title="Switch language"
+        title={t.switchLanguage}
         style={{
           display: 'flex',
           alignItems: 'center',

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useLanguage } from '../contexts/LanguageContext'
 
 export default function Toast({ message, type = 'info', onClose = null }) {
+  const { t } = useLanguage()
   const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function Toast({ message, type = 'info', onClose = null }) {
           fontSize: '1.2rem',
         }}
         onClick={handleClose}
-        title="Zamknij"
+        title={t.close}
       >
         ✕
       </button>

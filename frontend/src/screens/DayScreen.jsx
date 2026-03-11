@@ -39,7 +39,7 @@ function DetectiveResultDisplay({ detectiveResult }) {
         className="btn btn-ghost btn-sm"
         style={{ position: 'absolute', top: '8px', right: '8px', padding: '4px 8px' }}
         onClick={() => setShowResult(false)}
-        title="Zamknij"
+        title={t.close}
       >
         ✕
       </button>

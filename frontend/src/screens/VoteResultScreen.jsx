@@ -75,7 +75,7 @@ export default function VoteResultScreen({ state }) {
             <div className="divider">{t.voteResult.votingResults}</div>
             {tallyEntries.map(([id, count]) => {
               const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
-              const nick = getPlayerNick(id)
+              const nick = id === 'skip' ? (t.voteResult.skip || '⏭ Pomiń') : getPlayerNick(id)
               return (
                 <div key={id} style={{ marginBottom: '0.6rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
