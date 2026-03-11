@@ -3,7 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 import { LANGUAGES } from '../i18n/translations'
 
 export default function LanguageSwitcher() {
-  const { lang, setLang } = useLanguage()
+  const { lang, setLang, t } = useLanguage()
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 

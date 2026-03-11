@@ -587,7 +587,9 @@ export default function App() {
     <>
       <LanguageSwitcher />
       <GameHUD state={state} />
-      {renderScreen()}
+      <Suspense fallback={<LoadingFallback />}>
+        {renderScreen()}
+      </Suspense>
       {['night', 'day', 'voting'].includes(state.phase) && state.role && state.role !== 'villager' && (
         <RoleChat
           messages={state.chatMessages}
