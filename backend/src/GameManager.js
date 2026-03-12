@@ -315,17 +315,27 @@ class GameManager {
 
     // Every alive mafia must vote
     for (const m of aliveMafia) {
-      if (!room.nightActions.mafiaVotes[m.id]) return false;
+      if (!room.nightActions.mafiaVotes[m.id]) {
+        console.log(`[isNightComplete] FALSE — mafia ${m.nick} (${m.id}) has not voted`);
+        return false;
+      }
     }
 
     // Every alive doctor must act
-    if (aliveDoctor.length > 0 && !room.nightActions.doctorTarget) return false;
+    if (aliveDoctor.length > 0 && !room.nightActions.doctorTarget) {
+      console.log(`[isNightComplete] FALSE — doctor has not acted`);
+      return false;
+    }
 
     // Every alive detective must act
     for (const d of aliveDetective) {
-      if (!room.nightActions.detectiveTargets[d.id]) return false;
+      if (!room.nightActions.detectiveTargets[d.id]) {
+        console.log(`[isNightComplete] FALSE — detective ${d.nick} (${d.id}) has not acted`);
+        return false;
+      }
     }
 
+    console.log(`[isNightComplete] TRUE — all ${aliveMafia.length}M ${aliveDoctor.length}D ${aliveDetective.length}Det acted`);
     return true;
   }
 

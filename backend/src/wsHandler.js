@@ -558,7 +558,14 @@ function handleConnection(ws, gameManager) {
         }
 
         // If all actions done → resolve immediately
-        if (gameManager.isNightComplete(room.code)) {
+        const nightComplete = gameManager.isNightComplete(room.code);
+        console.log(`[NIGHT_ACTION] ${player.nick} (${player.role}) acted → isNightComplete=${nightComplete}`);
+        console.log(`[NIGHT_ACTION] nightActions:`, JSON.stringify({
+          mafiaVotes: Object.keys(room.nightActions.mafiaVotes).length,
+          doctorTarget: !!room.nightActions.doctorTarget,
+          detectiveTargets: Object.keys(room.nightActions.detectiveTargets).length,
+        }));
+        if (nightComplete) {
           doResolveNight(room, gameManager);
         }
         break;
