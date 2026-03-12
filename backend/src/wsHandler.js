@@ -367,7 +367,7 @@ function handleConnection(ws, gameManager) {
         const playerId = (data.playerId || '').trim();
 
         const result = gameManager.rejoinRoom(roomCode, playerId);
-        if (result.error) return send(ws, EVENTS.ERROR, { message: result.error });
+        if (result.error) return send(ws, 'rejoin_failed', { message: result.error });
 
         const { room, player } = result;
         player.ws = ws;
@@ -652,15 +652,10 @@ function handleConnection(ws, gameManager) {
     if (!room) return;
 
     const player = room.players[currentPlayerId];
-    if (player) {
+    if (player && player.ws === ws) {
       player.isConnected = false;
       player.ws = null;
       broadcastRoomUpdate(room);
-
-      // If the disconnected player had a pending night action, check if night is now complete
-      if (room.phase === PHASES.NIGHT && gameManager.isNightComplete(room.code)) {
-        doResolveNight(room, gameManager);
-      }
 
       // Host migration – delayed 5 min so a brief disconnect / page refresh doesn't transfer host
       if (room.hostId === currentPlayerId && room.phase !== PHASES.GAME_OVER) {

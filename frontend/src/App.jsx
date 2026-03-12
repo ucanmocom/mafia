@@ -344,6 +344,12 @@ export default function App() {
         break
       }
 
+      case 'rejoin_failed': {
+        localStorage.removeItem(STORAGE_KEY)
+        setState(INITIAL_STATE)
+        break
+      }
+
       case 'kicked': {
         localStorage.removeItem(STORAGE_KEY)
         setState(INITIAL_STATE)

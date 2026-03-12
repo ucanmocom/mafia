@@ -313,36 +313,17 @@ class GameManager {
     const aliveDoctor    = alive.filter((p) => p.role === ROLES.DOCTOR);
     const aliveDetective = alive.filter((p) => p.role === ROLES.DETECTIVE);
 
-    // Count ONLY CONNECTED players (who can actually send night_action event)
-    const connectedMafia = aliveMafia.filter((p) => p.isConnected !== false);
-    const connectedDoctor = aliveDoctor.filter((p) => p.isConnected !== false);
-    const connectedDetective = aliveDetective.filter((p) => p.isConnected !== false);
-
-    // ALL CONNECTED alive mafia must vote
-    if (connectedMafia.length > 0) {
-      const connectedMafiaIds = connectedMafia.map(p => p.id);
-      const missing = connectedMafiaIds.filter(id => !room.nightActions.mafiaVotes[id]);
-      if (missing.length > 0) {
-        console.log(`[night] Mafia incomplete: ${connectedMafiaIds.length - missing.length}/${connectedMafiaIds.length} voted`);
-        return false;
-      }
+    // Every alive mafia must vote
+    for (const m of aliveMafia) {
+      if (!room.nightActions.mafiaVotes[m.id]) return false;
     }
 
-    // CONNECTED Doctor must act
-    if (connectedDoctor.length > 0 && !room.nightActions.doctorTarget) {
-      console.log(`[night] Doctor has not acted`);
-      return false;
-    }
+    // Every alive doctor must act
+    if (aliveDoctor.length > 0 && !room.nightActions.doctorTarget) return false;
 
-    // ALL CONNECTED alive detectives must act
-    if (connectedDetective.length > 0) {
-      const detectiveIds = connectedDetective.map(d => d.id);
-      const pickedIds = Object.keys(room.nightActions.detectiveTargets);
-      const missing = detectiveIds.filter(id => !pickedIds.includes(id));
-      if (missing.length > 0) {
-        console.log(`[night] Detectives incomplete: ${pickedIds.length}/${connectedDetective.length} acted. Missing: ${missing.map(id => room.players[id]?.nick).join(', ')}`);
-        return false;
-      }
+    // Every alive detective must act
+    for (const d of aliveDetective) {
+      if (!room.nightActions.detectiveTargets[d.id]) return false;
     }
 
     return true;
