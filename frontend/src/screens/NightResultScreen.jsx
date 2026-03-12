@@ -2,7 +2,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 
 export default function NightResultScreen({ state }) {
   const { t } = useLanguage()
-  const { nightResult } = state
+  const { nightResult, detectiveResult, role } = state
 
   if (!nightResult) {
     return (
@@ -21,6 +21,24 @@ export default function NightResultScreen({ state }) {
   return (
     <div className="screen">
       <div className="card" style={{ textAlign: 'center' }}>
+        {role === 'detective' && detectiveResult && (
+          <div style={{
+            marginBottom: '1.25rem',
+            padding: '0.75rem 1rem',
+            borderRadius: 'var(--radius)',
+            background: detectiveResult.isMafia ? 'rgba(200,40,40,0.15)' : 'rgba(40,160,80,0.15)',
+            border: `1px solid ${detectiveResult.isMafia ? 'rgba(200,40,40,0.4)' : 'rgba(40,160,80,0.4)'}`,
+          }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>🔍 {t.roles.detective}</p>
+            <p style={{
+              fontWeight: 700,
+              color: detectiveResult.isMafia ? 'var(--red-bright)' : 'var(--green)',
+            }}>
+              {detectiveResult.targetNick} — {detectiveResult.isMafia ? t.toast.isMafia : t.toast.notMafia}
+            </p>
+          </div>
+        )}
+
         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
           {noKill ? '🌅' : '💀'}
         </div>
