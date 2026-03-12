@@ -16,7 +16,16 @@ export default defineConfig({
       input: {
         main: 'index.html',
       },
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-router': ['react-router-dom'],
+          'vendor-icons': ['lucide-react'],
+        },
+      },
     },
+    cssMinify: true,
+    target: 'es2020',
   },
   // Enable historyApiFallback for SPA routing
   appType: 'spa',

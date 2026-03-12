@@ -44,11 +44,30 @@
     <meta name="twitter:image" content="/image.png" />
 
     <link rel="icon" type="image/png" href="/image.png" />
+    <link rel="preload" as="image" href="/image.webp" type="image/webp" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    </noscript>
+    <style>
+      /* Critical inline CSS for instant FCP */
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#080506;color:#ede8e8;min-height:100dvh;-webkit-font-smoothing:antialiased}
+      #root{min-height:100dvh;display:flex;flex-direction:column}
+      .screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 20px 40px;gap:16px;min-height:100dvh}
+    </style>
   </head>
   <body>
     <div id="root"></div>

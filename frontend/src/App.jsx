@@ -97,23 +97,28 @@ export default function App() {
     }
   }, [state.roomCode, state.playerId, state.nick])
 
-  // ── Load Google Analytics 4 (lazy) ─────────────────────────────────────────
+  // ── Load Google Analytics 4 (lazy, deferred until idle) ──────────────────
   useEffect(() => {
-    // Załaduj GA4 tylko raz po mountowaniu
     if (window.gtag) return
 
-    // Utwórz window.dataLayer
-    window.dataLayer = window.dataLayer || []
-    function gtag() { window.dataLayer.push(arguments) }
-    gtag('js', new Date())
-    gtag('config', 'G-BQKWBED5QG')
-    window.gtag = gtag
+    const loadGA = () => {
+      window.dataLayer = window.dataLayer || []
+      function gtag() { window.dataLayer.push(arguments) }
+      gtag('js', new Date())
+      gtag('config', 'G-BQKWBED5QG')
+      window.gtag = gtag
 
-    // Dynamicznie załaduj skrypt Google Analytics asynchronicznie (nie blokuje)
-    const script = document.createElement('script')
-    script.async = true
-    script.src = 'https://www.googletagmanager.com/gtag/js?id=G-BQKWBED5QG'
-    document.head.appendChild(script)
+      const script = document.createElement('script')
+      script.async = true
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=G-BQKWBED5QG'
+      document.head.appendChild(script)
+    }
+
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(loadGA, { timeout: 3000 })
+    } else {
+      setTimeout(loadGA, 2000)
+    }
   }, [])
 
   // ── WebSocket message handler ─────────────────────────────────────────────
