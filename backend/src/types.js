@@ -66,7 +66,7 @@ const EVENTS = {
 // ─── Timers (ms) ──────────────────────────────────────────────────────────────
 const TIMERS = {
   ROLE_REVEAL_DURATION: 10_000,   // 10s na przeczytanie roli
-  NIGHT_ACTION_TIMEOUT: 60_000,   // 60s na wykonanie akcji nocnej
+  NIGHT_ACTION_TIMEOUT: 30_000,   // 30s na wykonanie akcji nocnej
   DAY_DURATION:         120_000,  // 2min dyskusja
   VOTING_DURATION:      60_000,   // 60s głosowanie
   VOTE_RESULT_DURATION: 5_000,    // 5s pokazanie wyniku głosowania

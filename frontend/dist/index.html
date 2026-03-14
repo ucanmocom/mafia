@@ -43,34 +43,34 @@
     />
     <meta name="twitter:image" content="/image.png" />
 
-    <link rel="icon" type="image/png" href="/image.png" />
-    <link rel="preload" as="image" href="/image.webp" type="image/webp" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+    <link rel="preload" as="image" href="/image.webp" type="image/webp" fetchpriority="high" />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap"
       rel="stylesheet"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     </noscript>
     <style>
-      /* Critical inline CSS for instant FCP */
+      /* Critical inline CSS for instant FCP + CLS prevention */
       *{box-sizing:border-box;margin:0;padding:0}
-      body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#080506;color:#ede8e8;min-height:100dvh;-webkit-font-smoothing:antialiased}
+      body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#080506;color:#ede8e8;min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
       #root{min-height:100dvh;display:flex;flex-direction:column}
       .screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 20px 40px;gap:16px;min-height:100dvh}
+      .home-hero{justify-content:center;min-height:100vh;overflow:auto;position:relative;background-color:#080506}
+      .home-title{font-size:6rem;font-weight:900;letter-spacing:.1em;color:#fff;text-transform:uppercase;line-height:.9;margin:0 0 12px 0}
+      .home-subtitle{font-size:1.3rem;color:rgba(255,255,255,.9);font-weight:400;letter-spacing:.2em;text-transform:uppercase}
     </style>
-    <script type="module" crossorigin src="/assets/main-DoFLfoek.js"></script>
+    <script type="module" crossorigin src="/assets/main-5Lmp8H_e.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/vendor-router-B4yMSKow.js">
-    <link rel="stylesheet" crossorigin href="/assets/main-BkZxEwze.css">
+    <link rel="stylesheet" crossorigin href="/assets/main-CCUdzSyr.css">
   </head>
   <body>
     <div id="root"></div>

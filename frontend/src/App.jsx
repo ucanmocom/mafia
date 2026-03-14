@@ -3,9 +3,9 @@ import { useWebSocket } from './hooks/useWebSocket'
 import { useLanguage } from './contexts/LanguageContext'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import HomeScreen       from './screens/HomeScreen'
-import LobbyScreen      from './screens/LobbyScreen'
-import RoleRevealScreen from './screens/RoleRevealScreen'
-// Lazy load game screens
+// Lazy load all non-home screens
+const LobbyScreen       = lazy(() => import('./screens/LobbyScreen'))
+const RoleRevealScreen  = lazy(() => import('./screens/RoleRevealScreen'))
 const NightScreen       = lazy(() => import('./screens/NightScreen'))
 const NightResultScreen = lazy(() => import('./screens/NightResultScreen'))
 const DayScreen        = lazy(() => import('./screens/DayScreen'))
@@ -37,9 +37,9 @@ const INITIAL_STATE = {
   isHost:      false,
   hostId:      null,
   players:     [],        // [{id, nick, isAlive, isHost, isConnected}]
-  settings:    { mafiaCount: 1, doctorCount: 1, detectiveCount: 1, loversCount: 0, dayDuration: 120000, nightDuration: 60000 },
+  settings:    { mafiaCount: 1, doctorCount: 1, detectiveCount: 1, loversCount: 0, dayDuration: 120000, nightDuration: 30000 },
   dayDuration: 120000, // ms
-  nightDuration: 60000, // ms
+  nightDuration: 30000, // ms
   round:       0,
   // Private role info
   role:        null,
@@ -51,6 +51,8 @@ const INITIAL_STATE = {
   // Night
   nightActionDone: false,
   mafiaVoteTally: {},     // {voterNick: targetNick}
+  doctorVoteTally: {},    // {voterNick: targetNick}
+  detectiveVoteTally: {}, // {voterNick: targetNick}
   detectiveResult: null,  // {targetNick, isMafia}
   // Night result
   nightResult: null,      // {killedNick, killedId}
@@ -115,9 +117,9 @@ export default function App() {
     }
 
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(loadGA, { timeout: 3000 })
+      requestIdleCallback(loadGA, { timeout: 5000 })
     } else {
-      setTimeout(loadGA, 2000)
+      setTimeout(loadGA, 4000)
     }
   }, [])
 
@@ -214,6 +216,8 @@ export default function App() {
           votes:           {},
           votedCount:      0,
           mafiaVoteTally:  {},
+          doctorVoteTally: {},
+          detectiveVoteTally: {},
           cannotVoteLoverError: null,
           detectiveResult: null,
           nightResult:     null,
@@ -269,6 +273,16 @@ export default function App() {
 
       case 'mafia_vote_update': {
         setState(s => ({ ...s, mafiaVoteTally: data.tally || {} }))
+        break
+      }
+
+      case 'doctor_vote_update': {
+        setState(s => ({ ...s, doctorVoteTally: data.tally || {} }))
+        break
+      }
+
+      case 'detective_vote_update': {
+        setState(s => ({ ...s, detectiveVoteTally: data.tally || {} }))
         break
       }
 
@@ -417,6 +431,8 @@ export default function App() {
         voteTally: {},
         detectiveResult: null,
         mafiaVoteTally: {},
+        doctorVoteTally: {},
+        detectiveVoteTally: {},
         chatMessages: [],
         skipDay: { count: 0, needed: 0, hasVoted: false },
         cannotVoteLoverError: null,
@@ -595,7 +611,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <main>
       <LanguageSwitcher />
       <GameHUD state={state} />
       <Suspense fallback={<LoadingFallback />}>
@@ -609,6 +625,6 @@ export default function App() {
         />
       )}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-    </>
+    </main>
   )
 }

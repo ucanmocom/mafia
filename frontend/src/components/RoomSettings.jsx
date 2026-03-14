@@ -132,8 +132,8 @@ export default function RoomSettings({ roomCode, players, nick, playerId, settin
           onInc={() => set('dayDuration', Math.min(300000, settings.dayDuration + 10000))}
         />
         <SettingRow label={t.settings.nightPhase} value={`${settings.nightDuration / 1000}s`}
-          onDec={() => set('nightDuration', Math.max(30000, settings.nightDuration - 10000))}
-          onInc={() => set('nightDuration', Math.min(180000, settings.nightDuration + 10000))}
+          onDec={() => set('nightDuration', Math.max(10000, settings.nightDuration - 5000))}
+          onInc={() => set('nightDuration', Math.min(180000, settings.nightDuration + 5000))}
         />
       </div>
 

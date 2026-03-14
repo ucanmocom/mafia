@@ -184,7 +184,7 @@ function triggerVoting(room, gameManager) {
 function doResolveNight(room, gameManager) {
   if (room.phase !== PHASES.NIGHT) return; // guard: prevent double-resolve
   clearPhaseTimer(room);
-  const { killed, detectiveResults, loverKilled, wasRandom, mafiaTarget } = gameManager.resolveNight(room.code);
+  const { killed, detectiveResult, loverKilled, wasRandom, mafiaTarget } = gameManager.resolveNight(room.code);
 
   // Prywatna wiadomość do mafii gdy głosy były podzielone i wylosowano ofiarę
   if (wasRandom && mafiaTarget) {
@@ -194,13 +194,24 @@ function doResolveNight(room, gameManager) {
     for (const mafioso of aliveMafia) {
       send(mafioso.ws, EVENTS.MAFIA_RANDOM_KILL, {
         targetNick: mafiaTarget.nick,
-        saved: killed === null, // true jeśli lekarz uratował
+        saved: killed === null,
       });
     }
   }
 
-  // Each detective gets their own private result immediately upon pick (sent in NIGHT_ACTION handler).
-  // Do NOT re-send here to avoid duplicate popup/toast during voting.
+  // Send shared detective result to all alive detectives
+  if (detectiveResult) {
+    const aliveDetectives = Object.values(room.players).filter(
+      (p) => p.role === ROLES.DETECTIVE && p.isAlive
+    );
+    for (const det of aliveDetectives) {
+      send(det.ws, EVENTS.NIGHT_RESULT, {
+        personal:   true,
+        isMafia:    detectiveResult.isMafia,
+        targetNick: detectiveResult.target.nick,
+      });
+    }
+  }
 
   // Everyone gets public night result
   broadcast(room, EVENTS.NIGHT_RESULT, {
@@ -270,8 +281,8 @@ function autoFillNightActions(room, gameManager) {
       if (targets.length)
         room.nightActions.mafiaVotes[player.id] = targets[Math.floor(Math.random() * targets.length)].id;
     }
-    if (player.role === ROLES.DOCTOR && !room.nightActions.doctorTarget) {
-      room.nightActions.doctorTarget = alive[Math.floor(Math.random() * alive.length)].id;
+    if (player.role === ROLES.DOCTOR && !room.nightActions.doctorTargets[player.id]) {
+      room.nightActions.doctorTargets[player.id] = alive[Math.floor(Math.random() * alive.length)].id;
     }
     if (player.role === ROLES.DETECTIVE && !room.nightActions.detectiveTargets[player.id]) {
       const targets = alive.filter((p) => p.id !== player.id);
@@ -433,9 +444,7 @@ function handleConnection(ws, gameManager) {
         broadcastRoomUpdate(leaveRoom);
 
         // If an in-progress phase can now complete, resolve it
-        if (leaveRoom.phase === PHASES.NIGHT && gameManager.isNightComplete(leaveRoom.code)) {
-          doResolveNight(leaveRoom, gameManager);
-        } else if (leaveRoom.phase === PHASES.VOTING) {
+        if (leaveRoom.phase === PHASES.VOTING) {
           const eligibleVoters = Object.values(leaveRoom.players).filter(
             (p) => p.isAlive && p.isConnected !== false
           );
@@ -534,40 +543,42 @@ function handleConnection(ws, gameManager) {
           role:       player.role,
         });
 
-        // Detective gets their result immediately upon pick
-        if (player.role === ROLES.DETECTIVE) {
-          send(ws, EVENTS.NIGHT_RESULT, {
-            personal:   true,
-            isMafia:    target.role === ROLES.MAFIA,
-            targetNick: target.nick,
-          });
-        }
-
-        // For mafia: broadcast updated mafia vote tally to other mafia members only
+        // For mafia: broadcast updated vote tally to other mafia members
         if (player.role === ROLES.MAFIA) {
           const mafia = Object.values(room.players).filter((p) => p.role === ROLES.MAFIA && p.isAlive);
           const tally = {};
           for (const [id, tid] of Object.entries(room.nightActions.mafiaVotes)) {
-            const voterNick  = room.players[id]?.nick;
-            const targetNick = room.players[tid]?.nick;
-            tally[voterNick] = targetNick;
+            tally[room.players[id]?.nick] = room.players[tid]?.nick;
           }
           for (const m of mafia) {
             send(m.ws, 'mafia_vote_update', { tally });
           }
         }
 
-        // If all actions done → resolve immediately
-        const nightComplete = gameManager.isNightComplete(room.code);
-        console.log(`[NIGHT_ACTION] ${player.nick} (${player.role}) acted → isNightComplete=${nightComplete}`);
-        console.log(`[NIGHT_ACTION] nightActions:`, JSON.stringify({
-          mafiaVotes: Object.keys(room.nightActions.mafiaVotes).length,
-          doctorTarget: !!room.nightActions.doctorTarget,
-          detectiveTargets: Object.keys(room.nightActions.detectiveTargets).length,
-        }));
-        if (nightComplete) {
-          doResolveNight(room, gameManager);
+        // For doctors: broadcast updated vote tally to other doctors
+        if (player.role === ROLES.DOCTOR) {
+          const doctors = Object.values(room.players).filter((p) => p.role === ROLES.DOCTOR && p.isAlive);
+          const tally = {};
+          for (const [id, tid] of Object.entries(room.nightActions.doctorTargets)) {
+            tally[room.players[id]?.nick] = room.players[tid]?.nick;
+          }
+          for (const d of doctors) {
+            send(d.ws, 'doctor_vote_update', { tally });
+          }
         }
+
+        // For detectives: broadcast updated vote tally to other detectives
+        if (player.role === ROLES.DETECTIVE) {
+          const detectives = Object.values(room.players).filter((p) => p.role === ROLES.DETECTIVE && p.isAlive);
+          const tally = {};
+          for (const [id, tid] of Object.entries(room.nightActions.detectiveTargets)) {
+            tally[room.players[id]?.nick] = room.players[tid]?.nick;
+          }
+          for (const det of detectives) {
+            send(det.ws, 'detective_vote_update', { tally });
+          }
+        }
+
         break;
       }
       // ── SKIP DAY ───────────────────────────────────────────────────────────────

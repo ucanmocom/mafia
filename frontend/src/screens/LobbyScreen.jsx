@@ -301,10 +301,10 @@ export default function LobbyScreen({ state, actions }) {
               />
               <SettingRow
                 label={t.lobby.night}
-                value={Math.round((localSettings.nightDuration || 60000) / 1000)}
-                min={30}
+                value={Math.round((localSettings.nightDuration || 30000) / 1000)}
+                min={10}
                 max={180}
-                step={10}
+                step={5}
                 onChange={v => handleSettingsChange('nightDuration', v * 1000)}
               />
             </div>

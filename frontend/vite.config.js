@@ -10,6 +10,9 @@ export default defineConfig({
       '/join': 'http://localhost:3001',
       '/health': 'http://localhost:3001',
     },
+    headers: {
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    },
   },
   build: {
     rollupOptions: {
@@ -26,6 +29,7 @@ export default defineConfig({
     },
     cssMinify: true,
     target: 'es2020',
+    assetsInlineLimit: 4096,
   },
   // Enable historyApiFallback for SPA routing
   appType: 'spa',

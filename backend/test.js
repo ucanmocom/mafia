@@ -87,9 +87,8 @@ assert('Doctor acted', !docAct.error);
 assert('Night is complete', gm.isNightComplete(room.code));
 
 // 12. Resolve night – doctor saved victim
-const { killed, detectiveResults } = gm.resolveNight(room.code);
+const { killed, detectiveResult } = gm.resolveNight(room.code);
 assert('Victim saved by doctor (killed=null)', killed === null);
-const detectiveResult = detectiveResults && detectiveResults[0];
 assert('Detective identified mafia', detectiveResult && detectiveResult.isMafia);
 assert('Phase is night_result', room.phase === PHASES.NIGHT_RESULT);
 

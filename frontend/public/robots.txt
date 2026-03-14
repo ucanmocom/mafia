@@ -1,15 +1,4 @@
 User-agent: *
 Allow: /
 
-# Sitemaps
-Sitemap: /sitemap.xml
-
-# Disallow admin areas (if any exist)
-Disallow: /admin/
-Disallow: /*?*
-
-# Allow all language versions
-Allow: /pl*
-Allow: /en*
-Allow: /fr* 
-Allow: /de*
+Sitemap: https://mafia.ucanmo.com/sitemap.xml

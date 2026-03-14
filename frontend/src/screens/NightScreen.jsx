@@ -3,7 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 
 export default function NightScreen({ state, actions }) {
   const { t } = useLanguage()
-  const { role, players, playerId, nightActionDone, mafiaVoteTally, detectiveResult, round, loverNick } = state
+  const { role, players, playerId, nightActionDone, mafiaVoteTally, doctorVoteTally, detectiveVoteTally, detectiveResult, round, loverNick } = state
   const myPlayer = players.find(p => p.id === playerId)
   const isAlive  = myPlayer ? myPlayer.isAlive !== false : true
 
@@ -59,10 +59,10 @@ export default function NightScreen({ state, actions }) {
           <MafiaNight targets={targets} nightActionDone={nightActionDone} onPick={handlePick} tally={mafiaVoteTally} t={t} />
         )}
         {isAlive && role === 'doctor'    && (
-          <DoctorNight targets={players.filter(p => p.isAlive !== false)} nightActionDone={nightActionDone} onPick={handlePick} t={t} />
+          <DoctorNight targets={players.filter(p => p.isAlive !== false)} nightActionDone={nightActionDone} onPick={handlePick} tally={doctorVoteTally} t={t} />
         )}
         {isAlive && role === 'detective' && (
-          <DetectiveNight targets={targets} nightActionDone={nightActionDone} detectiveResult={detectiveResult} onPick={handlePick} t={t} />
+          <DetectiveNight targets={targets} nightActionDone={nightActionDone} onPick={handlePick} tally={detectiveVoteTally} t={t} />
         )}
       </div>
     </div>
@@ -147,7 +147,8 @@ function MafiaNight({ targets, nightActionDone, onPick, tally, t }) {
   )
 }
 
-function DoctorNight({ targets, nightActionDone, onPick, t }) {
+function DoctorNight({ targets, nightActionDone, onPick, tally, t }) {
+  const tallyEntries = Object.entries(tally)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <p style={{ color: 'var(--green-light)', fontWeight: 600 }}>{t.night.doctorHeal}</p>
@@ -155,68 +156,43 @@ function DoctorNight({ targets, nightActionDone, onPick, t }) {
         ? <p style={{ color: 'var(--text-muted)' }}>{t.night.doctorSaved}</p>
         : <PlayerList players={targets} onPick={onPick} />
       }
+      {tallyEntries.length > 0 && (
+        <div style={{ background: 'var(--surface2)', borderRadius: 'var(--radius)', padding: '10px 14px' }}>
+          <p className="label-cap" style={{ marginBottom: '6px' }}>{t.night.doctorVotes || 'Głosy lekarzy'}</p>
+          {tallyEntries.map(([voter, target]) => (
+            <p key={voter} style={{ fontSize: '0.82rem', marginBottom: '2px' }}>
+              <span style={{ color: 'var(--text-muted)' }}>{voter}</span>
+              <span style={{ color: 'var(--border2)', margin: '0 6px' }}>→</span>
+              <strong>{target}</strong>
+            </p>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
-function DetectiveNight({ targets, nightActionDone, detectiveResult, onPick, t }) {
-  const [resultTimer, setResultTimer] = useState(10)
-  const [showResult, setShowResult]   = useState(false)
-  const [lastResult, setLastResult]   = useState(null)
-
-  useEffect(() => {
-    if (detectiveResult && detectiveResult !== lastResult) { 
-      setShowResult(true)
-      setResultTimer(10)
-      setLastResult(detectiveResult)
-    }
-  }, [detectiveResult, lastResult])
-
-  useEffect(() => {
-    if (!showResult) return
-    if (resultTimer <= 0) { setShowResult(false); return }
-    const id = setInterval(() => setResultTimer(t => Math.max(0, t - 1)), 1000)
-    return () => clearInterval(id)
-  }, [showResult, resultTimer])
-
+function DetectiveNight({ targets, nightActionDone, onPick, tally, t }) {
+  const tallyEntries = Object.entries(tally)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <p style={{ color: 'var(--text-dim)', fontWeight: 600 }}>{t.night.detectiveInvest}</p>
-      {showResult && detectiveResult && (
-        <div className={detectiveResult.isMafia ? 'detective-popup' : 'detective-popup safe'}>
-          <button
-            style={{
-              position: 'absolute', top: '10px', right: '10px',
-              width: '32px', height: '32px',
-              borderRadius: '50%',
-              background: 'rgba(255,255,255,0.15)',
-              border: '2px solid rgba(255,255,255,0.4)',
-              color: '#fff',
-              fontSize: '1rem',
-              fontWeight: 900,
-              cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              lineHeight: 1,
-            }}
-            onClick={() => setShowResult(false)}
-            title={t.lobby.close}
-          >
-            ✕
-          </button>
-          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>{detectiveResult.isMafia ? '🔪' : '✅'}</div>
-          <p style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '8px' }}>{detectiveResult.targetNick}</p>
-          <span className="badge" style={{ background: detectiveResult.isMafia ? 'var(--red-bright)' : 'var(--green)', marginBottom: '12px' }}>
-            {detectiveResult.isMafia ? 'MAFIA' : t.night.innocent}
-          </span>
-          <p className="label-cap" style={{ marginTop: '12px' }}>{t.night.disappears} {resultTimer}s</p>
+      {nightActionDone
+        ? <p style={{ color: 'var(--text-muted)' }}>{t.night.waitResult}</p>
+        : <PlayerList players={targets} onPick={onPick} />
+      }
+      {tallyEntries.length > 0 && (
+        <div style={{ background: 'var(--surface2)', borderRadius: 'var(--radius)', padding: '10px 14px' }}>
+          <p className="label-cap" style={{ marginBottom: '6px' }}>{t.night.detectiveVotes || 'Głosy detektywów'}</p>
+          {tallyEntries.map(([voter, target]) => (
+            <p key={voter} style={{ fontSize: '0.82rem', marginBottom: '2px' }}>
+              <span style={{ color: 'var(--text-muted)' }}>{voter}</span>
+              <span style={{ color: 'var(--border2)', margin: '0 6px' }}>→</span>
+              <strong>{target}</strong>
+            </p>
+          ))}
         </div>
       )}
-      {nightActionDone && !showResult
-        ? <p style={{ color: 'var(--text-muted)' }}>{t.night.waitResult}</p>
-        : !nightActionDone
-          ? <PlayerList players={targets} onPick={onPick} />
-          : null
-      }
     </div>
   )
 }

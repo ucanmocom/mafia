@@ -61,7 +61,7 @@ class GameManager {
         detectiveCount: 1,
         loversCount: 0,       // 0 = off, 1 = one pair of lovers
         dayDuration: 120_000, // ms
-        nightDuration: 60_000, // ms
+        nightDuration: 30_000, // ms
       },
       phase: PHASES.LOBBY,
       round: 0,
@@ -284,7 +284,7 @@ class GameManager {
         room.nightActions.detectiveTargets[playerId] = targetId;
         break;
       case ROLES.DOCTOR:
-        room.nightActions.doctorTarget = targetId;
+        room.nightActions.doctorTargets[playerId] = targetId;
         break;
       case ROLES.MAFIA:
         room.nightActions.mafiaVotes[playerId] = targetId;
@@ -322,9 +322,11 @@ class GameManager {
     }
 
     // Every alive doctor must act
-    if (aliveDoctor.length > 0 && !room.nightActions.doctorTarget) {
-      console.log(`[isNightComplete] FALSE — doctor has not acted`);
-      return false;
+    for (const d of aliveDoctor) {
+      if (!room.nightActions.doctorTargets[d.id]) {
+        console.log(`[isNightComplete] FALSE — doctor ${d.nick} (${d.id}) has not acted`);
+        return false;
+      }
     }
 
     // Every alive detective must act
@@ -348,20 +350,20 @@ class GameManager {
     if (!room) return { error: 'Pokój nie istnieje.' };
 
     const { targetId: mafiaTargetId, wasRandom } = this._getMafiaMajorityTarget(room);
-    const doctorTarget = room.nightActions.doctorTarget;
-    const detectiveTargets = room.nightActions.detectiveTargets; // { detectiveId → targetId }
+    const { targetId: doctorTargetId } = this._getDoctorMajorityTarget(room);
+    const { targetId: detectiveTargetId } = this._getDetectiveMajorityTarget(room);
 
     let killed = null;
-    if (mafiaTargetId && mafiaTargetId !== doctorTarget) {
+    if (mafiaTargetId && mafiaTargetId !== doctorTargetId) {
       room.players[mafiaTargetId].isAlive = false;
       killed = room.players[mafiaTargetId];
     }
 
-    // Per-detective private results
-    const detectiveResults = [];
-    for (const [detId, targetId] of Object.entries(detectiveTargets)) {
-      const t = room.players[targetId];
-      if (t) detectiveResults.push({ detectiveId: detId, target: t, isMafia: t.role === ROLES.MAFIA });
+    // Single shared detective result (majority-voted target)
+    let detectiveResult = null;
+    if (detectiveTargetId) {
+      const t = room.players[detectiveTargetId];
+      if (t) detectiveResult = { target: t, isMafia: t.role === ROLES.MAFIA };
     }
 
     // Lover chain death — if killed has a lover, they die too
@@ -371,7 +373,7 @@ class GameManager {
     room.nightResult = { killedId: killed ? killed.id : null };
     room.phase = PHASES.NIGHT_RESULT;
 
-    return { room, killed, detectiveResults, loverKilled, wasRandom, mafiaTarget };
+    return { room, killed, detectiveResult, loverKilled, wasRandom, mafiaTarget };
   }
 
   // ── Day phase ───────────────────────────────────────────────────────────────
@@ -535,7 +537,7 @@ class GameManager {
   // ── Helpers ─────────────────────────────────────────────────────────────────
 
   _emptyNightActions() {
-    return { detectiveTargets: {}, doctorTarget: null, mafiaVotes: {} };
+    return { detectiveTargets: {}, doctorTargets: {}, mafiaVotes: {} };
   }
 
   /**
@@ -556,31 +558,44 @@ class GameManager {
       (p) => p.isAlive && p.role === ROLES.MAFIA
     );
     if (aliveMafia.length === 0) return { targetId: null, wasRandom: false };
+    return this._getMajorityFromVotes(room.nightActions.mafiaVotes);
+  }
 
-    // Policz głosy dla każdego celu
+  _getDoctorMajorityTarget(room) {
+    const aliveDoctor = Object.values(room.players).filter(
+      (p) => p.isAlive && p.role === ROLES.DOCTOR
+    );
+    if (aliveDoctor.length === 0) return { targetId: null, wasRandom: false };
+    return this._getMajorityFromVotes(room.nightActions.doctorTargets);
+  }
+
+  _getDetectiveMajorityTarget(room) {
+    const aliveDetective = Object.values(room.players).filter(
+      (p) => p.isAlive && p.role === ROLES.DETECTIVE
+    );
+    if (aliveDetective.length === 0) return { targetId: null, wasRandom: false };
+    return this._getMajorityFromVotes(room.nightActions.detectiveTargets);
+  }
+
+  _getMajorityFromVotes(votes) {
     const tally = {};
-    for (const vote of Object.values(room.nightActions.mafiaVotes)) {
+    for (const vote of Object.values(votes)) {
       tally[vote] = (tally[vote] || 0) + 1;
     }
 
     const votedTargets = Object.keys(tally);
     if (votedTargets.length === 0) return { targetId: null, wasRandom: false };
 
-    // Znajdź maksymalną liczbę głosów
     const maxVotes = Math.max(...Object.values(tally));
-    
-    // Zbierz wszystkie cele z maksymalną liczbą głosów
     const topTargets = Object.entries(tally)
       .filter(([_, count]) => count === maxVotes)
       .map(([id, _]) => id);
 
-    // Jeśli jest remis, losuj spośród tych z równą ilością głosów
     if (topTargets.length > 1) {
       const randomTarget = topTargets[Math.floor(Math.random() * topTargets.length)];
       return { targetId: randomTarget, wasRandom: true };
     }
 
-    // Jedna osoba ma największą liczbę głosów
     return { targetId: topTargets[0], wasRandom: false };
   }
 

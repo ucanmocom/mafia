@@ -99,10 +99,9 @@ section('3. Detective identifies mafia vs non-mafia');
   gm.recordNightAction(room.code, doctor.id,  villager.id);
   gm.recordNightAction(room.code, det.id,     mafia.id);
 
-  const { detectiveResults } = gm.resolveNight(room.code);
-  const res = detectiveResults[0];
-  assert('Detective checks mafia → isMafia=true', res.isMafia === true);
-  assert('Detective result target is mafia', res.target.id === mafia.id);
+  const { detectiveResult } = gm.resolveNight(room.code);
+  assert('Detective checks mafia → isMafia=true', detectiveResult.isMafia === true);
+  assert('Detective result target is mafia', detectiveResult.target.id === mafia.id);
 
   // Second room: detective checks villager
   const { gm: gm2, room: room2, byRole: br2 } = buildRoom({ mafiaCount: 1, doctorCount: 1, detectiveCount: 1 });
@@ -111,12 +110,12 @@ section('3. Detective identifies mafia vs non-mafia');
   gm2.recordNightAction(room2.code, br2.doctor[0].id,  br2.villager[0].id);
   gm2.recordNightAction(room2.code, br2.detective[0].id, v2.id);
 
-  const { detectiveResults: dr2 } = gm2.resolveNight(room2.code);
-  assert('Detective checks villager → isMafia=false', dr2[0].isMafia === false);
+  const { detectiveResult: dr2 } = gm2.resolveNight(room2.code);
+  assert('Detective checks villager → isMafia=false', dr2.isMafia === false);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-section('4. Multiple detectives — each gets own result');
+section('4. Multiple detectives — majority vote decides target');
 {
   // Need enough players: 1 mafia + 1 doctor + 2 detectives + 2 villagers = 6
   const { gm, room, byRole } = buildRoom({ mafiaCount: 1, doctorCount: 1, detectiveCount: 2 });
@@ -124,18 +123,16 @@ section('4. Multiple detectives — each gets own result');
   const mafia = byRole.mafia[0];
   const villager = byRole.villager[0];
 
+  // Both detectives vote for mafia → majority is mafia
   gm.recordNightAction(room.code, mafia.id,          villager.id);
   gm.recordNightAction(room.code, byRole.doctor[0].id, villager.id);
   gm.recordNightAction(room.code, det1.id,           mafia.id);
-  gm.recordNightAction(room.code, det2.id,           villager.id);
+  gm.recordNightAction(room.code, det2.id,           mafia.id);
 
-  const { detectiveResults } = gm.resolveNight(room.code);
-  assert('Two detective results returned', detectiveResults.length === 2);
-
-  const r1 = detectiveResults.find(r => r.detectiveId === det1.id);
-  const r2 = detectiveResults.find(r => r.detectiveId === det2.id);
-  assert('Det1 checked mafia → true',    r1 && r1.isMafia === true);
-  assert('Det2 checked villager → false', r2 && r2.isMafia === false);
+  const { detectiveResult } = gm.resolveNight(room.code);
+  assert('Single detective result returned', detectiveResult !== null);
+  assert('Majority target is mafia → isMafia=true', detectiveResult.isMafia === true);
+  assert('Target is mafia player', detectiveResult.target.id === mafia.id);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
