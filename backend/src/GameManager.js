@@ -120,6 +120,7 @@ class GameManager {
   rejoinRoom(roomCode, playerId) {
     const room = this.rooms.get(roomCode.toUpperCase());
     if (!room) return { error: 'Pokój nie istnieje.' };
+    if (room.phase === PHASES.GAME_OVER) return { error: 'Gra zakończona.' };
     const player = room.players[playerId];
     if (!player) return { error: 'Gracz nie znaleziony.' };
     player.isConnected = true;
