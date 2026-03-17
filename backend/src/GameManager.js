@@ -354,6 +354,11 @@ class GameManager {
     const { targetId: doctorTargetId } = this._getDoctorMajorityTarget(room);
     const { targetId: detectiveTargetId } = this._getDetectiveMajorityTarget(room);
 
+    console.log(`[resolveNight] room=${roomCode} round=${room.round}`);
+    console.log(`  mafiaTarget=${mafiaTargetId} (${mafiaTargetId ? room.players[mafiaTargetId]?.nick : 'none'}) wasRandom=${wasRandom}`);
+    console.log(`  doctorTarget=${doctorTargetId} (${doctorTargetId ? room.players[doctorTargetId]?.nick : 'none'})`);
+    console.log(`  saved=${mafiaTargetId && mafiaTargetId === doctorTargetId}`);
+
     let killed = null;
     if (mafiaTargetId && mafiaTargetId !== doctorTargetId) {
       room.players[mafiaTargetId].isAlive = false;
