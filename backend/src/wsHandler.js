@@ -129,9 +129,8 @@ function scheduleNextPhase(room, gameManager) {
       break;
 
     case PHASES.NIGHT:
-      // AFK safety net: auto-resolve after timeout
+      // Resolve night when timer expires — no auto-fill, resolve uses actual votes only
       room.phaseTimer = setTimeout(() => {
-        autoFillNightActions(room, gameManager);
         doResolveNight(room, gameManager);
       }, nightDuration);
       break;
@@ -270,28 +269,6 @@ function broadcastGameOver(room, winner) {
 }
 
 /** Auto-fill missing night actions with random valid targets to prevent stall */
-function autoFillNightActions(room, gameManager) {
-  const alive = Object.values(room.players).filter((p) => p.isAlive);
-
-  for (const player of alive) {
-    if (player.role === ROLES.MAFIA && !room.nightActions.mafiaVotes[player.id]) {
-      const targets = alive.filter(
-        (p) => p.id !== player.id && p.role !== ROLES.MAFIA
-      );
-      if (targets.length)
-        room.nightActions.mafiaVotes[player.id] = targets[Math.floor(Math.random() * targets.length)].id;
-    }
-    if (player.role === ROLES.DOCTOR && !room.nightActions.doctorTargets[player.id]) {
-      room.nightActions.doctorTargets[player.id] = alive[Math.floor(Math.random() * alive.length)].id;
-    }
-    if (player.role === ROLES.DETECTIVE && !room.nightActions.detectiveTargets[player.id]) {
-      const targets = alive.filter((p) => p.id !== player.id);
-      if (targets.length)
-        room.nightActions.detectiveTargets[player.id] = targets[Math.floor(Math.random() * targets.length)].id;
-    }
-  }
-}
-
 // ─── Main handler ─────────────────────────────────────────────────────────────
 
 /**
@@ -539,6 +516,7 @@ function handleConnection(ws, gameManager) {
 
         // ACK to acting player
         send(ws, 'night_action_ack', {
+          targetId:   target.id,
           targetNick: target.nick,
           role:       player.role,
         });

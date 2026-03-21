@@ -3,7 +3,7 @@ import { useLanguage } from '../contexts/LanguageContext'
 
 export default function NightScreen({ state, actions }) {
   const { t } = useLanguage()
-  const { role, players, playerId, nightActionDone, mafiaVoteTally, doctorVoteTally, detectiveVoteTally, detectiveResult, round, loverNick } = state
+  const { role, players, playerId, nightActionDone, nightActionTargetId, mafiaVoteTally, doctorVoteTally, detectiveVoteTally, detectiveResult, round, loverNick } = state
   const myPlayer = players.find(p => p.id === playerId)
   const isAlive  = myPlayer ? myPlayer.isAlive !== false : true
 
@@ -16,7 +16,7 @@ export default function NightScreen({ state, actions }) {
   }, [round, state.nightDuration])
 
   const targets = players.filter(p => p.isAlive !== false && p.id !== playerId)
-  const handlePick = (targetId) => { if (!nightActionDone) actions.nightAction(targetId) }
+  const handlePick = (targetId) => actions.nightAction(targetId)
   const timerColor = timeLeft <= 10 ? 'var(--red-bright)' : 'var(--text)'
 
   return (
@@ -56,13 +56,13 @@ export default function NightScreen({ state, actions }) {
         {!isAlive && <SpectatorView t={t} />}
         {isAlive && role === 'villager'  && <VillagerNight t={t} />}
         {isAlive && role === 'mafia'     && (
-          <MafiaNight targets={targets} nightActionDone={nightActionDone} onPick={handlePick} tally={mafiaVoteTally} t={t} />
+          <MafiaNight targets={targets} selectedId={nightActionTargetId} onPick={handlePick} tally={mafiaVoteTally} t={t} />
         )}
         {isAlive && role === 'doctor'    && (
-          <DoctorNight targets={players.filter(p => p.isAlive !== false)} nightActionDone={nightActionDone} onPick={handlePick} tally={doctorVoteTally} t={t} />
+          <DoctorNight targets={players.filter(p => p.isAlive !== false)} selectedId={nightActionTargetId} onPick={handlePick} tally={doctorVoteTally} t={t} />
         )}
         {isAlive && role === 'detective' && (
-          <DetectiveNight targets={targets} nightActionDone={nightActionDone} onPick={handlePick} tally={detectiveVoteTally} t={t} />
+          <DetectiveNight targets={targets} selectedId={nightActionTargetId} onPick={handlePick} tally={detectiveVoteTally} t={t} />
         )}
       </div>
     </div>
@@ -88,49 +88,50 @@ function VillagerNight({ t }) {
   )
 }
 
-function PlayerList({ players, onPick }) {
+function PlayerList({ players, onPick, selectedId }) {
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-      {players.map(p => (
-        <button
-          key={p.id}
-          onClick={() => onPick(p.id)}
-          style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
-            background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
-          }}
-        >
-          <div style={{
-            width: 52, height: 52, borderRadius: '50%',
-            background: 'var(--surface2)',
-            border: '2px solid var(--border)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '1.2rem', fontWeight: 900, color: 'var(--text)',
-            transition: 'border-color .12s, background .12s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--red-bright)'; e.currentTarget.style.background = 'var(--surface3)' }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--surface2)' }}
+      {players.map(p => {
+        const isSelected = p.id === selectedId
+        return (
+          <button
+            key={p.id}
+            onClick={() => onPick(p.id)}
+            style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+              background: 'none', border: 'none', cursor: 'pointer', padding: '4px',
+            }}
           >
-            {p.nick[0].toUpperCase()}
-          </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--text-dim)', maxWidth: 56, textAlign: 'center', wordBreak: 'break-word', lineHeight: 1.2 }}>
-            {p.nick}
-          </span>
-        </button>
-      ))}
+            <div style={{
+              width: 52, height: 52, borderRadius: '50%',
+              background: isSelected ? 'var(--surface3)' : 'var(--surface2)',
+              border: isSelected ? '2px solid var(--red-bright)' : '2px solid var(--border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.2rem', fontWeight: 900, color: 'var(--text)',
+              transition: 'border-color .12s, background .12s',
+              boxShadow: isSelected ? '0 0 8px rgba(255,60,60,0.3)' : 'none',
+            }}
+            onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.borderColor = 'var(--red-bright)'; e.currentTarget.style.background = 'var(--surface3)' } }}
+            onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--surface2)' } }}
+            >
+              {isSelected ? '✓' : p.nick[0].toUpperCase()}
+            </div>
+            <span style={{ fontSize: '0.68rem', color: isSelected ? 'var(--red-bright)' : 'var(--text-dim)', maxWidth: 56, textAlign: 'center', wordBreak: 'break-word', lineHeight: 1.2, fontWeight: isSelected ? 700 : 400 }}>
+              {p.nick}
+            </span>
+          </button>
+        )
+      })}
     </div>
   )
 }
 
-function MafiaNight({ targets, nightActionDone, onPick, tally, t }) {
+function MafiaNight({ targets, selectedId, onPick, tally, t }) {
   const tallyEntries = Object.entries(tally)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <p style={{ color: 'var(--red-bright)', fontWeight: 600 }}>{t.night.mafiaKill}</p>
-      {nightActionDone
-        ? <p style={{ color: 'var(--text-muted)' }}>{t.night.voteCast}</p>
-        : <PlayerList players={targets} onPick={onPick} />
-      }
+      <PlayerList players={targets} onPick={onPick} selectedId={selectedId} />
       {tallyEntries.length > 0 && (
         <div style={{ background: 'var(--surface2)', borderRadius: 'var(--radius)', padding: '10px 14px' }}>
           <p className="label-cap" style={{ marginBottom: '6px' }}>{t.night.mafiaVotes}</p>
@@ -147,15 +148,12 @@ function MafiaNight({ targets, nightActionDone, onPick, tally, t }) {
   )
 }
 
-function DoctorNight({ targets, nightActionDone, onPick, tally, t }) {
+function DoctorNight({ targets, selectedId, onPick, tally, t }) {
   const tallyEntries = Object.entries(tally)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <p style={{ color: 'var(--green-light)', fontWeight: 600 }}>{t.night.doctorHeal}</p>
-      {nightActionDone
-        ? <p style={{ color: 'var(--text-muted)' }}>{t.night.doctorSaved}</p>
-        : <PlayerList players={targets} onPick={onPick} />
-      }
+      <PlayerList players={targets} onPick={onPick} selectedId={selectedId} />
       {tallyEntries.length > 0 && (
         <div style={{ background: 'var(--surface2)', borderRadius: 'var(--radius)', padding: '10px 14px' }}>
           <p className="label-cap" style={{ marginBottom: '6px' }}>{t.night.doctorVotes || 'Głosy lekarzy'}</p>
@@ -172,15 +170,12 @@ function DoctorNight({ targets, nightActionDone, onPick, tally, t }) {
   )
 }
 
-function DetectiveNight({ targets, nightActionDone, onPick, tally, t }) {
+function DetectiveNight({ targets, selectedId, onPick, tally, t }) {
   const tallyEntries = Object.entries(tally)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
       <p style={{ color: 'var(--text-dim)', fontWeight: 600 }}>{t.night.detectiveInvest}</p>
-      {nightActionDone
-        ? <p style={{ color: 'var(--text-muted)' }}>{t.night.waitResult}</p>
-        : <PlayerList players={targets} onPick={onPick} />
-      }
+      <PlayerList players={targets} onPick={onPick} selectedId={selectedId} />
       {tallyEntries.length > 0 && (
         <div style={{ background: 'var(--surface2)', borderRadius: 'var(--radius)', padding: '10px 14px' }}>
           <p className="label-cap" style={{ marginBottom: '6px' }}>{t.night.detectiveVotes || 'Głosy detektywów'}</p>

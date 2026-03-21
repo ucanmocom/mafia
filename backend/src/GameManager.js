@@ -564,7 +564,20 @@ class GameManager {
       (p) => p.isAlive && p.role === ROLES.MAFIA
     );
     if (aliveMafia.length === 0) return { targetId: null, wasRandom: false };
-    return this._getMajorityFromVotes(room.nightActions.mafiaVotes);
+
+    // Use only actual votes (no auto-fill). If at least one mafia voted, decide
+    // from real votes only — AFK members don't dilute the result.
+    const result = this._getMajorityFromVotes(room.nightActions.mafiaVotes);
+    if (result.targetId) return result;
+
+    // All mafia AFK — pick random non-mafia target so the game progresses
+    const alive = Object.values(room.players).filter((p) => p.isAlive);
+    const targets = alive.filter((p) => p.role !== ROLES.MAFIA);
+    if (targets.length === 0) return { targetId: null, wasRandom: false };
+    return {
+      targetId: targets[Math.floor(Math.random() * targets.length)].id,
+      wasRandom: true,
+    };
   }
 
   _getDoctorMajorityTarget(room) {

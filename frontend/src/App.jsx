@@ -50,6 +50,7 @@ const INITIAL_STATE = {
   cannotVoteLoverError: null,  // {targetNick} when trying to vote for lover
   // Night
   nightActionDone: false,
+  nightActionTargetId: null,
   mafiaVoteTally: {},     // {voterNick: targetNick}
   doctorVoteTally: {},    // {voterNick: targetNick}
   detectiveVoteTally: {}, // {voterNick: targetNick}
@@ -212,6 +213,7 @@ export default function App() {
           dayDuration:     s.dayDuration,
           nightDuration:   s.nightDuration,
           nightActionDone: false,
+          nightActionTargetId: null,
           hasVoted:        false,
           votes:           {},
           votedCount:      0,
@@ -266,7 +268,7 @@ export default function App() {
       }
 
       case 'night_action_ack': {
-        setState(s => ({ ...s, nightActionDone: true }))
+        setState(s => ({ ...s, nightActionDone: true, nightActionTargetId: data.targetId || null }))
         showToast(`${tRef.current.toast.selected} ${data.targetNick}`, 'success')
         break
       }
