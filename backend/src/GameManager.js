@@ -69,6 +69,7 @@ class GameManager {
       votes: {},           // playerId → targetId
       nightResult: null,   // { killed: id | null }
       voteResult: null,    // { eliminated: id | null, role: string | null, tie: bool }
+      votingSession: null, // { status, startedAt, endsAt, durationMs, resolvedAt, reason }
       winner: null,
       createdAt: Date.now(),
       phaseTimer: null,       // transient handle
@@ -245,6 +246,7 @@ class GameManager {
     room.votes = {};
     room.nightResult = null;
     room.voteResult = null;
+    room.votingSession = null;
     room.winner = null;
     room.skipDayVotes = {};
     room.loverIds = null;
@@ -389,6 +391,7 @@ class GameManager {
     if (!room) return { error: 'Pokój nie istnieje.' };
     room.phase = PHASES.DAY;
     room.votes = {};
+    room.votingSession = null;
     room.skipDayVotes = {};
     return { room };
   }
@@ -427,7 +430,17 @@ class GameManager {
     if (!room) return { error: 'Pokój nie istnieje.' };
     room.phase = PHASES.VOTING;
     room.votes = {};
-    return { room };
+    room.voteResult = null;
+    const now = Date.now();
+    room.votingSession = {
+      status: 'active',
+      startedAt: now,
+      endsAt: now + TIMERS.VOTING_DURATION,
+      durationMs: TIMERS.VOTING_DURATION,
+      resolvedAt: null,
+      reason: null,
+    };
+    return { room, votingSession: room.votingSession };
   }
 
   recordVote(roomCode, voterId, targetId) {
@@ -449,16 +462,61 @@ class GameManager {
     }
 
     room.votes[voterId] = targetId;
-    return { room };
+
+    const votingProgress = this.getVotingProgress(roomCode);
+    return { room, votingProgress };
+  }
+
+  getVotingProgress(roomCode) {
+    const room = this.rooms.get(roomCode);
+    if (!room) {
+      return {
+        totalEligible: 0,
+        votedCount: 0,
+        remaining: 0,
+        allVoted: false,
+        tally: {},
+      };
+    }
+
+    const eligibleVoters = Object.values(room.players).filter((p) => p.isAlive);
+    const votedCount = Object.keys(room.votes).filter((voterId) => {
+      const voter = room.players[voterId];
+      return voter && voter.isAlive;
+    }).length;
+
+    const tally = {};
+    for (const targetId of Object.values(room.votes)) {
+      tally[targetId] = (tally[targetId] || 0) + 1;
+    }
+
+    const totalEligible = eligibleVoters.length;
+    const remaining = Math.max(0, totalEligible - votedCount);
+
+    return {
+      totalEligible,
+      votedCount,
+      remaining,
+      allVoted: totalEligible > 0 && votedCount >= totalEligible,
+      tally,
+    };
   }
 
   /**
    * Resolves voting: plurality wins.
    * 'skip' votes count as abstain – if skip has the most votes, nobody is eliminated.
    */
-  resolveVoting(roomCode) {
+  resolveVoting(roomCode, reason = 'manual') {
     const room = this.rooms.get(roomCode);
     if (!room) return { error: 'Pokój nie istnieje.' };
+
+    if (room.phase !== PHASES.VOTING) {
+      return { error: 'Głosowanie nie jest aktywne.' };
+    }
+
+    if (!room.votingSession || room.votingSession.status !== 'active') {
+      return { error: 'Sesja głosowania nie jest aktywna.' };
+    }
 
     const tally = {};
     for (const targetId of Object.values(room.votes)) {
@@ -498,6 +556,9 @@ class GameManager {
       loverEliminatedNick: loverEliminated ? loverEliminated.nick : null,
       loverEliminatedRole: loverEliminated ? loverEliminated.role : null,
     };
+    room.votingSession.status = 'resolved';
+    room.votingSession.resolvedAt = Date.now();
+    room.votingSession.reason = reason;
     room.phase = PHASES.VOTE_RESULT;
 
     return { room, eliminated, tie: tie || skipWins, loverEliminated };
@@ -658,6 +719,18 @@ class GameManager {
       room.phaseTimer = null;
       room.hostMigrateTimer = null;
       room.skipDayVotes = room.skipDayVotes || {};
+      room.votingSession = room.votingSession || null;
+      if (room.phase === PHASES.VOTING && !room.votingSession) {
+        const now = Date.now();
+        room.votingSession = {
+          status: 'active',
+          startedAt: now,
+          endsAt: now + TIMERS.VOTING_DURATION,
+          durationMs: TIMERS.VOTING_DURATION,
+          resolvedAt: null,
+          reason: 'restored',
+        };
+      }
       this.rooms.set(code, room);
     }
   }

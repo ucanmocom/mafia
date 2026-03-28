@@ -61,6 +61,8 @@ const INITIAL_STATE = {
   votes:       {},        // {targetId: count}
   hasVoted:    false,
   votedCount:  0,
+  voteEligibleTotal: 0,
+  votingEndsAt: null,
   // Vote summary
   voteDisplay: {},  // {voterNick: targetNick}
   voteTally: {},    // {targetId: count}
@@ -174,6 +176,7 @@ export default function App() {
           isHost:          pid === data.hostId,
           role:            data.role            || s.role,
           roleDescription: data.roleDescription || s.roleDescription,
+          votingEndsAt:    data.votingEndsAt ?? s.votingEndsAt,
           winner:          data.winner,
         }))
         showToast(tRef.current.toast.reconnected, 'success')
@@ -217,6 +220,10 @@ export default function App() {
           hasVoted:        false,
           votes:           {},
           votedCount:      0,
+          voteEligibleTotal: data.phase === 'voting'
+            ? (data.alivePlayers?.filter(p => p.isAlive !== false).length || 0)
+            : 0,
+          votingEndsAt:    data.phase === 'voting' ? (data.votingEndsAt ?? null) : null,
           mafiaVoteTally:  {},
           doctorVoteTally: {},
           detectiveVoteTally: {},
@@ -293,6 +300,8 @@ export default function App() {
           ...s,
           votes:      data.tally || {},
           votedCount: data.votedCount || 0,
+          voteEligibleTotal: data.totalEligible || s.voteEligibleTotal,
+          votingEndsAt: data.votingEndsAt ?? s.votingEndsAt,
         }))
         break
       }

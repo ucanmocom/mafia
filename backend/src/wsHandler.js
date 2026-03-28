@@ -172,10 +172,13 @@ function triggerDay(room, gameManager) {
 }
 
 function triggerVoting(room, gameManager) {
-  gameManager.startVoting(room.code);
+  const startResult = gameManager.startVoting(room.code);
+  if (startResult.error) return;
+  const votingEndsAt = startResult.votingSession?.endsAt ?? null;
   broadcast(room, EVENTS.PHASE_CHANGE, {
     phase: PHASES.VOTING,
     alivePlayers: publicPlayersView(room),
+    votingEndsAt,
   });
   scheduleNextPhase(room, gameManager);
 }
@@ -226,8 +229,13 @@ function doResolveNight(room, gameManager) {
 }
 
 function doResolveVoting(room, gameManager) {
+  if (room.phase !== PHASES.VOTING) return;
   clearPhaseTimer(room);
-  const { eliminated, tie, loverEliminated } = gameManager.resolveVoting(room.code);
+  const progress = gameManager.getVotingProgress(room.code);
+  const reason = progress.allVoted ? 'all_voted' : 'timeout';
+  const resolveResult = gameManager.resolveVoting(room.code, reason);
+  if (resolveResult.error) return;
+  const { eliminated } = resolveResult;
 
   // Build vote display: voter nick → target nick
   const voteDisplay = {};
@@ -381,6 +389,7 @@ function handleConnection(ws, gameManager) {
           players:   publicPlayersView(room),
           nightResult: room.nightResult,
           votes:     room.votes,
+          votingEndsAt: room.votingSession?.endsAt ?? null,
           winner:    room.winner,
         });
 
@@ -568,11 +577,7 @@ function handleConnection(ws, gameManager) {
         broadcast(skipRoom, EVENTS.SKIP_DAY_UPDATE, { skipCount, needed });
         if (triggered) {
           clearPhaseTimer(skipRoom);
-          broadcast(skipRoom, EVENTS.PHASE_CHANGE, {
-            phase: PHASES.VOTING,
-            alivePlayers: publicPlayersView(skipRoom),
-          });
-          scheduleNextPhase(skipRoom, gameManager);
+          triggerVoting(skipRoom, gameManager);
         }
         break;
       }
@@ -609,26 +614,22 @@ function handleConnection(ws, gameManager) {
         }
 
         const room = result.room;
+        const progress = result.votingProgress || gameManager.getVotingProgress(currentRoomCode);
 
         // Confirm to the voter that their vote was accepted by the server.
         send(ws, EVENTS.VOTE_ACK, { targetId: data.targetId });
 
-        // Broadcast live vote counts (without revealing who voted for whom)
-        const tally = {};
-        for (const targetId of Object.values(room.votes)) {
-          tally[targetId] = (tally[targetId] || 0) + 1;
-        }
-        // All alive players must vote (disconnected players are still eligible – timer resolves if they don't return)
-        const eligibleVoters = Object.values(room.players).filter((p) => p.isAlive);
-        const votedCount = Object.keys(room.votes).filter((voterId) => {
-          const voter = room.players[voterId];
-          return voter && voter.isAlive;
-        }).length;
-        console.log(`[vote] Player ${room.players[currentPlayerId]?.nick} voted for ${room.players[data.targetId]?.nick || 'skip'}. Votes: ${votedCount}/${eligibleVoters.length}`);
-        broadcast(room, EVENTS.VOTE_UPDATE, { tally, votedCount });
+        console.log(`[vote] Player ${room.players[currentPlayerId]?.nick} voted for ${room.players[data.targetId]?.nick || 'skip'}. Votes: ${progress.votedCount}/${progress.totalEligible}`);
+        broadcast(room, EVENTS.VOTE_UPDATE, {
+          tally: progress.tally,
+          votedCount: progress.votedCount,
+          totalEligible: progress.totalEligible,
+          remaining: progress.remaining,
+          votingEndsAt: room.votingSession?.endsAt ?? null,
+        });
 
-        // If all alive and connected players voted → resolve immediately
-        if (votedCount >= eligibleVoters.length) {
+        // If all alive players voted → resolve immediately
+        if (progress.allVoted) {
           console.log(`[vote] All players voted! Resolving voting.`);
           doResolveVoting(room, gameManager);
         }
